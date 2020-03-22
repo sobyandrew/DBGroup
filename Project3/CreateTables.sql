@@ -50,9 +50,11 @@ CREATE TABLE CUSTOMER
   House_num INT,
   Street_name VARCHAR(20),
   City VARCHAR(20),
-  Zipcode VARCHAR(6), /*int?*/
-  /*finish zipcode part now*/
-  
+  Zipcode CHAR(6), /*int?*/
+  State CHAR(2),
+  CONSTRAINT CUSTOMERPK
+    PRIMARY KEY(Customer_id));
+
 CREATE TABLE ORDER
   (Order_id  VARCHAR(10) NOT NULL,
   Total_cost_bus DECIMAL(5,2), /*with 5,2 max is $999.99 should 6,2 ... 7,2 be used*/
@@ -62,7 +64,7 @@ CREATE TABLE ORDER
     PRIMARY KEY(Order_id));
 
 CREATE TABLE DINE_IN
-  (Order_id VARCHAR NOT NULL,
+  (Order_id VARCHAR(10) NOT NULL,
   Table_num INT,
   CONSTRAINT DINE_INPK
     PRIMARY KEY(Order_id),
@@ -70,9 +72,78 @@ CREATE TABLE DINE_IN
     FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id));
 
 CREATE TABLE SEATS
-  (Order_id VARCHAR NOT NULL,
+  (Order_id VARCHAR(10) NOT NULL,
   Seat_nums INT,
   CONSTRAINT SEATSPK
     PRIMARY KEY (Order_id, Seat_nums),
   CONSTRAINT SEATSFK
     FOREIGN KEY(Order_id) REFERENCES DINE_IN(Order_id));
+
+CREATE TABLE PICKUP
+  (Order_id VARCHAR(10) NOT NULL,
+  Cust_id   VARCHAR(15),
+  CONSTRAINT PICKUPPK
+    PRIMARY KEY(Order_id),
+  CONSTRAINT PICKUPFK
+  FOREIGN KEY(Cust_id) REFERENCES CUSTOMER(Customer_id));
+
+CREATE TABLE DELIVERY
+  (Order_id VARCHAR(10) NOT NULL,
+  Cust_id   VARCHAR(15),
+  CONSTRAINT DELIVERYPK
+    PRIMARY KEY(Order_id),
+  CONSTRAINT DELIVERYFK
+  FOREIGN KEY(Cust_id) REFERENCES CUSTOMER(Customer_id));
+
+CREATE TABLE DISCOUNT
+  (Discount_id VARCHAR(10) NOT NULL,
+  Name         VARCHAR(15),
+  CONSTRAINT DISCOUNTPK
+    PRIMARY KEY(Discount_id));
+
+CREATE TABLE PERCENTAGE_DISCOUNT
+  (Discount_id VARCHAR(10) NOT NULL,
+  Percent_off  Decimal(4,2)/*can be 99.99 % max*/
+  CONSTRAINT PERCENTAGE_DISCOUNTPK
+    PRIMARY KEY(Discount_id),
+  CONSTRAINT PERCENTAGE_DISCOUNTFK
+    FOREIGN KEY(Discount_id) REFERENCES DISCOUNT(Discount_id));
+
+CREATE TABLE DOLLAR_DISCOUNT
+  (Discount_id VARCHAR(10) NOT NULL,
+  Amount_off   Decimal(4,2), /*goes up to $99.99*/
+  CONSTRAINT DOLLAR_DISCOUNTPK
+    PRIMARY KEY(Discount_id),
+  CONSTRAINT DOLLAR_DISCOUNTFK
+    FOREIGN KEY(Discount_id) REFERENCES DISCOUNT(Discount_id));
+
+CREATE TABLE ORDER_USE_DISCOUNT
+  (Discount_id VARCHAR(10) NOT NULL,
+  Order_id     VARCHAR(10) NOT NULL,
+  CONSTRAINT ORDER_USE_DISCOUNTPK
+    PRIMARY KEY(Discount_id, Order_id),
+  CONSTRAINT ORDER_USE_DISCOUNT_DISFK
+    FOREIGN KEY(Discount_id) REFERENCES DISCOUNT(Discount_id),
+  CONSTRAINT ORDER_USE_DISCOUNT_ORDFK
+    FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id));
+
+CREATE TABLE PIZZA_USE_DISCOUNT
+  (Discount_id VARCHAR(10) NOT NULL,
+  Pizza_id     VARCHAR(10) NOT NULL,
+  CONSTRAINT PIZZA_USE_DISCOUNTPK
+    PRIMARY KEY(Discount_id, Pizza_id),
+  CONSTRAINT PIZZA_USE_DISCOUNT_DISFK
+    FOREIGN KEY(Discount_id) REFERENCES DISCOUNT(Discount_id),
+  CONSTRAINT PIZZA_USE_DISCOUNT_PIZZFK
+    FOREIGN KEY(Pizza_id) REFERENCES PIZZA(Pizza_id));
+
+
+/* this is to add in the fk constraints for pizza as when its created
+   the pks of order and base price do not yet exist to reference.
+   I could make order and base price first i think to just add it in
+   directly and remove the alter, but should work as is.*/
+ALTER TABLE PIZZA ADD CONSTRAINT ORDERFK
+  FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id);
+  
+ALTER TABLE PIZZA ADD CONSTRAINT BASE_PRICEFK
+  FOREIGN KEY(Base_price_id) REFERENCES BASE_PRICE(Base_price_id);
