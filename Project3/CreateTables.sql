@@ -37,7 +37,7 @@ CREATE TABLE PIZZA_CONTAINS_TOPPING
   CONSTRAINT PIZ_CON_TOP_PK
     PRIMARY KEY(Pizza_id, Topping_name),
   CONSTRAINT PIZ_CON_TOP_PIZ_FK
-    FOREIGN KEY(Pizza_id) REFERENCES PIZZA(Pizza_id)
+    FOREIGN KEY(Pizza_id) REFERENCES PIZZA(Pizza_id),
   CONSTRAINT PIZ_CON_TOP_NAME_FK
     FOREIGN KEY(Topping_name) REFERENCES TOPPINGS(Name)); /* add on update / on delete cascade?*/
 
@@ -55,11 +55,11 @@ CREATE TABLE CUSTOMER
   CONSTRAINT CUSTOMERPK
     PRIMARY KEY(Customer_id));
 
-CREATE TABLE ORDER
+CREATE TABLE ORDER_
   (Order_id  VARCHAR(10) NOT NULL,
   Total_cost_bus DECIMAL(5,2), /*with 5,2 max is $999.99 should 6,2 ... 7,2 be used*/
   Total_cost_cust DECIMAL(5,2),
-  Dining_status BOOLEAN DEFAULT 0, /*what should data type be*/
+  Dining_status INT, /*what should data type be*/
   CONSTRAINT ORDERPK
     PRIMARY KEY(Order_id));
 
@@ -69,7 +69,7 @@ CREATE TABLE DINE_IN
   CONSTRAINT DINE_INPK
     PRIMARY KEY(Order_id),
   CONSTRAINT DINE_INFK
-    FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id));
+    FOREIGN KEY(Order_id) REFERENCES ORDER_(Order_id));
 
 CREATE TABLE SEATS
   (Order_id VARCHAR(10) NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE DISCOUNT
 
 CREATE TABLE PERCENTAGE_DISCOUNT
   (Discount_id VARCHAR(10) NOT NULL,
-  Percent_off  Decimal(4,2)/*can be 99.99 % max*/
+  Percent_off  Decimal(4,2),/*can be 99.99 % max*/
   CONSTRAINT PERCENTAGE_DISCOUNTPK
     PRIMARY KEY(Discount_id),
   CONSTRAINT PERCENTAGE_DISCOUNTFK
@@ -125,7 +125,7 @@ CREATE TABLE ORDER_USE_DISCOUNT
   CONSTRAINT ORDER_USE_DISCOUNT_DISFK
     FOREIGN KEY(Discount_id) REFERENCES DISCOUNT(Discount_id),
   CONSTRAINT ORDER_USE_DISCOUNT_ORDFK
-    FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id));
+    FOREIGN KEY(Order_id) REFERENCES ORDER_(Order_id));
 
 CREATE TABLE PIZZA_USE_DISCOUNT
   (Discount_id VARCHAR(10) NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE PIZZA_USE_DISCOUNT
    I could make order and base price first i think to just add it in
    directly and remove the alter, but should work as is.*/
 ALTER TABLE PIZZA ADD CONSTRAINT ORDERFK
-  FOREIGN KEY(Order_id) REFERENCES ORDER(Order_id);
-  
+  FOREIGN KEY(Order_id) REFERENCES ORDER_(Order_id);
+
 ALTER TABLE PIZZA ADD CONSTRAINT BASE_PRICEFK
   FOREIGN KEY(Base_price_id) REFERENCES BASE_PRICE(Base_price_id);
