@@ -20,13 +20,14 @@ CREATE TABLE BASE_PRICE
     PRIMARY KEY(Base_price_id));
 
 CREATE TABLE TOPPINGS
-  (Name          VARCHAR(15) NOT NULL,
-  Price_to_cust  DECIMAL(4,2), /* might only need 3,2*/
-  Price_to_bus   DECIMAL(4,2), /* same as above */
-  Small_amnt     INT,
-  Medium_amnt    INT,
-  Large_amnt     INT,
-  XLarge_amnt    INT,
+  (Name          VARCHAR(20) NOT NULL,
+  Price          DECIMAL(4,2), /* might only need 3,2*/
+  Cost_per_unit  DECIMAL(4,2), /* same as above */
+  Inventory      INT,
+  Small          DECIMAL(3,2),
+  Medium         DECIMAL(3,2),
+  Large          DECIMAL(3,2),
+  XLarge         DECIMAL(3,2),
   CONSTRAINT TOPPINGPK
     PRIMARY KEY(Name));
 
@@ -107,9 +108,10 @@ CREATE TABLE DISCOUNT
   CONSTRAINT DISCOUNTPK
     PRIMARY KEY(Discount_id));
 
+-- possiby add a Name VARCHAR(20) field to percent / dollar
 CREATE TABLE PERCENTAGE_DISCOUNT
   (Discount_id VARCHAR(10) NOT NULL,
-  Percent_off  Decimal(4,2),/*can be 99.99 % max*/
+  Percent_off  Decimal(4,2), -- change to int?
   CONSTRAINT PERCENTAGE_DISCOUNTPK
     PRIMARY KEY(Discount_id),
   CONSTRAINT PERCENTAGE_DISCOUNTFK
@@ -118,7 +120,7 @@ CREATE TABLE PERCENTAGE_DISCOUNT
 
 CREATE TABLE DOLLAR_DISCOUNT
   (Discount_id VARCHAR(10) NOT NULL,
-  Amount_off   Decimal(4,2), /*goes up to $99.99*/
+  Amount_off   Decimal(4,2), -- change to 3,2?
   CONSTRAINT DOLLAR_DISCOUNTPK
     PRIMARY KEY(Discount_id),
   CONSTRAINT DOLLAR_DISCOUNTFK
