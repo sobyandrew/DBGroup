@@ -59,3 +59,93 @@ INSERT INTO TOPPINGS(Name, Price, Cost_per_unit, Inventory, Small, Medium, Large
 
 INSERT INTO TOPPINGS(Name, Price, Cost_per_unit, Inventory, Small, Medium, Large, XLarge)
   VALUES('Bacon', 1.5, 0.25, 89, 1, 1.5, 2, 3);
+
+
+-- populate the discounts place into discount table then the appropriate percentage / dollar amount table
+
+INSERT INTO DISCOUNT(Discount_id, Name)
+  VALUES(1,'employee');
+
+INSERT INTO PERCENTAGE_DISCOUNT(Discount_id,Percent_off)
+  VALUES(1,15);
+
+INSERT INTO DISCOUNT(Discount_id, Name)
+  VALUES(2,'Lunch Special Medium');
+
+INSERT INTO DOLLAR_DISCOUNT(Discount_id, Amount_off)
+  VALUES(2,1);
+
+INSERT INTO DISCOUNT(Discount_id, Name)
+  VALUES(3,'Lunch Special Large');
+
+INSERT INTO DOLLAR_DISCOUNT(Discount_id, Amount_off)
+  VALUES(3,2);
+
+INSERT INTO DISCOUNT(Discount_id, Name)
+  VALUES(4,'Specialty Pizza');
+
+INSERT INTO DOLLAR_DISCOUNT(Discount_id, Amount_off)
+  VALUES(4,1.5);
+
+INSERT INTO DISCOUNT(Discount_id, Name)
+  VALUES(5,'Gameday Special');
+
+INSERT INTO PERCENTAGE_DISCOUNT(Discount_id,Percent_off)
+  VALUES(5,20);
+
+-- populate base prices
+
+/*template to copy FROM
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(, '', '', , );
+*/
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(1, 'small', 'Thin', 3, 0.5);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(2, 'small', 'Original', 3, 0.75);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(3, 'small', 'Pan', 3.5, 1);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(4, 'small', 'Gluten-Free', 4, 2);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(5, 'medium', 'Thin', 5, 1);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(6, 'medium', 'Original', 5, 1.5);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(7, 'medium', 'Pan', 6, 2.25);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(8, 'medium', 'Gluten-Free', 6.25, 3);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(9, 'Large', 'Thin', 8, 1.25);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(10, 'Large', 'Original', 8, 2);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(11, 'Large', 'Pan', 9, 3);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(12, 'Large', 'Gluten-Free', 9.5, 4);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(13, 'X-Large', 'Thin', 10, 2);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(14, 'X-Large', 'Original', 10, 3);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(15, 'X-Large', 'Pan', 11.5, 4.5);
+
+INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
+  VALUES(16, 'X-Large', 'Gluten-Free', 12.5, 6);
+
+
+-- finish populating the orders

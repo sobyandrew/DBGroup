@@ -1,26 +1,26 @@
 CREATE TABLE PIZZA
-  (Pizza_id       VARCHAR(10)   NOT NULL,
+  (Pizza_id       INT   NOT NULL,
   Timestamp_pizza VARCHAR(8),
   Price           DECIMAL(4,2),
   Cost_to_bus     DECIMAL(4,2),
   Status          INT,
-  Order_id        VARCHAR(10),
-  Base_price_id   VARCHAR(10),
+  Order_id        INT,
+  Base_price_id   INT,
   CONSTRAINT PIZZAPK
     PRIMARY KEY(Pizza_id));
 /*need to add 2x ALTER TABLE PIZZA ADD CONSTRAINT FKNAME for order id and base price id at very end*/
 
 CREATE TABLE BASE_PRICE
-  (Base_price_id  VARCHAR(10) NOT NULL,
-  Base_cost       DECIMAL(4,2),
-  Size            INT,
-  Crust_type      VARCHAR(15),
+  (Base_price_id  INT NOT NULL,
+  Size            VARCHAR(30),
+  Crust_type      VARCHAR(30),
   Price           DECIMAL(4,2),
+  Base_cost       DECIMAL(4,2),
   CONSTRAINT BASE_PRICEPK
     PRIMARY KEY(Base_price_id));
 
 CREATE TABLE TOPPINGS
-  (Name          VARCHAR(20) NOT NULL,
+  (Name          VARCHAR(40) NOT NULL,
   Price          DECIMAL(4,2), /* might only need 3,2*/
   Cost_per_unit  DECIMAL(4,2), /* same as above */
   Inventory      INT,
@@ -32,8 +32,8 @@ CREATE TABLE TOPPINGS
     PRIMARY KEY(Name));
 
 CREATE TABLE PIZZA_CONTAINS_TOPPING
-  (Pizza_id     VARCHAR(10) NOT NULL,
-  Topping_name  VARCHAR(15) NOT NULL,
+  (Pizza_id     INT NOT NULL,
+  Topping_name  VARCHAR(40) NOT NULL,
   Extra_topping BOOLEAN DEFAULT 0, /*FALSE? was trying to find info on BOOLEAN data type i think this should work*/
   CONSTRAINT PIZ_CON_TOP_PK
     PRIMARY KEY(Pizza_id, Topping_name),
@@ -45,9 +45,9 @@ CREATE TABLE PIZZA_CONTAINS_TOPPING
     /*ON UPDATE CASCADE     ON DELETE CASCADE*/); /* add on update / on delete cascade?*/
 
 CREATE TABLE CUSTOMER
-  (Customer_id VARCHAR(15) NOT NULL,
+  (Customer_id INT NOT NULL,
   Fname VARCHAR(20),
-  Mname VARCHAR(20),
+  /*Mname VARCHAR(20),*/
   Lname VARCHAR(20),
   Phone_num VARCHAR(10),/*stores 10 numbers do we want to account for international code / dashes / parens?*/
   House_num INT,
@@ -59,7 +59,7 @@ CREATE TABLE CUSTOMER
     PRIMARY KEY(Customer_id));
 
 CREATE TABLE ORDER_
-  (Order_id  VARCHAR(10) NOT NULL,
+  (Order_id  INT NOT NULL,
   Total_cost_bus DECIMAL(5,2), /*with 5,2 max is $999.99 should 6,2 ... 7,2 be used*/
   Total_cost_cust DECIMAL(5,2),
   Dining_status INT, /*what should data type be*/
@@ -67,7 +67,7 @@ CREATE TABLE ORDER_
     PRIMARY KEY(Order_id));
 
 CREATE TABLE DINE_IN
-  (Order_id VARCHAR(10) NOT NULL,
+  (Order_id INT NOT NULL,
   Table_num INT,
   CONSTRAINT DINE_INPK
     PRIMARY KEY(Order_id),
@@ -76,7 +76,7 @@ CREATE TABLE DINE_IN
     /*ON UPDATE CASCADE     ON DELETE CASCADE*/);
 
 CREATE TABLE SEATS
-  (Order_id VARCHAR(10) NOT NULL,
+  (Order_id INT NOT NULL,
   Seat_nums INT,
   CONSTRAINT SEATSPK
     PRIMARY KEY (Order_id, Seat_nums),
@@ -85,8 +85,8 @@ CREATE TABLE SEATS
     ON UPDATE CASCADE     ON DELETE CASCADE);
 
 CREATE TABLE PICKUP
-  (Order_id VARCHAR(10) NOT NULL,
-  Cust_id   VARCHAR(15),
+  (Order_id INT NOT NULL,
+  Cust_id   INT,
   CONSTRAINT PICKUPPK
     PRIMARY KEY(Order_id),
   CONSTRAINT PICKUPFK
@@ -94,8 +94,8 @@ CREATE TABLE PICKUP
   ON UPDATE CASCADE     ON DELETE CASCADE);
 
 CREATE TABLE DELIVERY
-  (Order_id VARCHAR(10) NOT NULL,
-  Cust_id   VARCHAR(15),
+  (Order_id INT NOT NULL,
+  Cust_id   INT,
   CONSTRAINT DELIVERYPK
     PRIMARY KEY(Order_id),
   CONSTRAINT DELIVERYFK
@@ -103,14 +103,14 @@ CREATE TABLE DELIVERY
   ON UPDATE CASCADE     ON DELETE CASCADE);
 
 CREATE TABLE DISCOUNT
-  (Discount_id VARCHAR(10) NOT NULL,
-  Name         VARCHAR(15),
+  (Discount_id INT NOT NULL,
+  Name         VARCHAR(40),
   CONSTRAINT DISCOUNTPK
     PRIMARY KEY(Discount_id));
 
 -- possiby add a Name VARCHAR(20) field to percent / dollar
 CREATE TABLE PERCENTAGE_DISCOUNT
-  (Discount_id VARCHAR(10) NOT NULL,
+  (Discount_id INT NOT NULL,
   Percent_off  Decimal(4,2), -- change to int?
   CONSTRAINT PERCENTAGE_DISCOUNTPK
     PRIMARY KEY(Discount_id),
@@ -119,7 +119,7 @@ CREATE TABLE PERCENTAGE_DISCOUNT
     /*ON UPDATE CASCADE     ON DELETE CASCADE*/);
 
 CREATE TABLE DOLLAR_DISCOUNT
-  (Discount_id VARCHAR(10) NOT NULL,
+  (Discount_id INT NOT NULL,
   Amount_off   Decimal(4,2), -- change to 3,2?
   CONSTRAINT DOLLAR_DISCOUNTPK
     PRIMARY KEY(Discount_id),
@@ -128,8 +128,8 @@ CREATE TABLE DOLLAR_DISCOUNT
     /*ON UPDATE CASCADE     ON DELETE CASCADE*/);
 
 CREATE TABLE ORDER_USE_DISCOUNT
-  (Discount_id VARCHAR(10) NOT NULL,
-  Order_id     VARCHAR(10) NOT NULL,
+  (Discount_id INT NOT NULL,
+  Order_id     INT NOT NULL,
   CONSTRAINT ORDER_USE_DISCOUNTPK
     PRIMARY KEY(Discount_id, Order_id),
   CONSTRAINT ORDER_USE_DISCOUNT_DISFK
@@ -140,8 +140,8 @@ CREATE TABLE ORDER_USE_DISCOUNT
     /*ON UPDATE CASCADE     ON DELETE CASCADE*/);
 
 CREATE TABLE PIZZA_USE_DISCOUNT
-  (Discount_id VARCHAR(10) NOT NULL,
-  Pizza_id     VARCHAR(10) NOT NULL,
+  (Discount_id INT NOT NULL,
+  Pizza_id     INT NOT NULL,
   CONSTRAINT PIZZA_USE_DISCOUNTPK
     PRIMARY KEY(Discount_id, Pizza_id),
   CONSTRAINT PIZZA_USE_DISCOUNT_DISFK
