@@ -1,6 +1,6 @@
 CREATE TABLE PIZZA
   (Pizza_id       INT   NOT NULL,
-  Timestamp_pizza VARCHAR(8),
+  Timestamp_pizza VARCHAR(40),
   Price           DECIMAL(4,2),
   Cost_to_bus     DECIMAL(4,2),
   Status          INT,
@@ -34,7 +34,7 @@ CREATE TABLE TOPPINGS
 CREATE TABLE PIZZA_CONTAINS_TOPPING
   (Pizza_id     INT NOT NULL,
   Topping_name  VARCHAR(40) NOT NULL,
-  Extra_topping BOOLEAN DEFAULT 0, /*FALSE? was trying to find info on BOOLEAN data type i think this should work*/
+  Extra_topping BOOLEAN DEFAULT FALSE, /*FALSE? was trying to find info on BOOLEAN data type i think this should work*/
   CONSTRAINT PIZ_CON_TOP_PK
     PRIMARY KEY(Pizza_id, Topping_name),
   CONSTRAINT PIZ_CON_TOP_PIZ_FK

@@ -1,7 +1,3 @@
-/*test*/
-INSERT INTO ORDER_(Order_ID, Total_cost_bus, Total_cost_cust, Dining_status)
-  VALUES('123456789', 5.5, 4.4, 1);
-
   -- populating the toppings tables
 
   /* template for copy paste
@@ -147,5 +143,73 @@ INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
 INSERT INTO BASE_PRICE(Base_price_id, Size, Crust_type, Price, Base_cost)
   VALUES(16, 'X-Large', 'Gluten-Free', 12.5, 6);
 
+/* template for each order with all the required changes in DB tables
+--toppings, discounts, base_price done so can refer to these tables
+-- finish populating the orders this is what needs to be added into db for each order
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(, , , );
 
--- finish populating the orders
+--for each order its either dine in and seats / pickup /  delivery not more than 1
+INSERT INTO DINE_IN(Order_id, Table_num)
+  VALUES( , );
+
+INSERT INTO SEATS(Order_id, Seat_nums)
+  VALUES( , );
+
+INSERT INTO PICKUP(Order_id, Cust_id)
+  VALUES( , );
+
+INSERT INTO DELIVERY(Order_id, Cust_id)
+  VALUES( , );
+
+INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
+  VALUES( , '', , , , , );
+
+--repeat this for each and every topping
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( , '',);
+
+--this is gross can we just combine address?
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( , '', '', '', , '', '', '', '');
+
+--either pizza use disc / or order use discount or none
+
+INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+  VALUES( , );
+
+INSERT INTO ORDER_USE_DISCOUNT(Discount_id, Order_id)
+  VALUES( , );
+
+--end all things that need to be added into db for each order
+*/
+/*ORDER 1 BELOW*/
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(1, 3.68, 13.50, 1);
+
+INSERT INTO DINE_IN(Order_id, Table_num)
+  VALUES( 1, 14);
+
+INSERT INTO SEATS(Order_id, Seat_nums)
+  VALUES( 1, 1);
+INSERT INTO SEATS(Order_id, Seat_nums)
+  VALUES( 1, 2);
+INSERT INTO SEATS(Order_id, Seat_nums)
+  VALUES( 1, 3);
+
+INSERT INTO PIZZA
+  VALUES(1, 'March 5th at 12:03PM', 13.50, 3.68, 1, 1, 9);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 1, 'Regular Cheese', TRUE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 1, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 1, 'Sausage', FALSE);
+
+INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+  VALUES( 3, 1);
+
+/*END ORDER 1*/
