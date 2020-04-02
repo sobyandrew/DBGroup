@@ -1,0 +1,5 @@
+Andrew Soby and Blake Washburn
+Project 3 CPSC 4620
+
+Connection string: mysql -h mysql1.cs.clemson.edu -u AntnPzDB_4nnj -p AntonPizzaDB_n3kq
+Password: Onlineclass2020*
