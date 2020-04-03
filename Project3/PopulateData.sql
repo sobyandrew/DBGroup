@@ -278,11 +278,10 @@ INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(4, 19.80, 64.50, 2);
 
 INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
-  VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', NULL, NULL, NULL, NULL, NULL);
+  VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', 115, 'Party Blvd', 'Anderson', '29621', 'SC');
 
 INSERT INTO PICKUP(Order_id, Cust_id)
   VALUES(4, 1);
-
 
 INSERT INTO PIZZA
   VALUES(4, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
@@ -292,6 +291,51 @@ INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
 
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 4, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA
+  VALUES(12, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(12, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(12, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA
+  VALUES(13, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(13, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(13, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA
+  VALUES(14, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(14, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(14, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA
+  VALUES(15, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(15, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(15, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA
+  VALUES(16, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(16, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES(16, 'Pepperoni', FALSE);
 /* should we add his address or update it later? hes the next order again
 --this is gross can we just combine address?
 INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
