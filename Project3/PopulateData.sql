@@ -149,7 +149,9 @@ INSERT INTO BASE_PRICE
 INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(, , , );
 
---for each order its either dine in and seats / pickup /  delivery not more than 1
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( , '', '', '', , '', '', '', '');
+
 INSERT INTO DINE_IN(Order_id, Table_num)
   VALUES( , );
 
@@ -165,15 +167,8 @@ INSERT INTO DELIVERY(Order_id, Cust_id)
 INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
   VALUES( , '', , , , , );
 
---repeat this for each and every topping
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( , '',);
-
---this is gross can we just combine address?
-INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
-  VALUES( , '', '', '', , '', '', '', '');
-
---either pizza use disc / or order use discount or none
 
 INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
   VALUES( , );
@@ -213,3 +208,254 @@ INSERT INTO PIZZA_USE_DISCOUNT
   VALUES( 3, 1);
 
 /*END ORDER 1*/
+
+/*ORDER 2*/
+
+INSERT INTO ORDER_
+  VALUES(2, 3.23, 10.60, 1);
+
+
+INSERT INTO DINE_IN
+  VALUES(2, 4);
+
+INSERT INTO SEATS
+  VALUES(2, 1);
+
+INSERT INTO PIZZA
+  VALUES(2, 'March 3rd at 12:05PM', 10.60, 3.23, 1, 2, 7);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING
+  VALUES( 2, 'Feta Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING
+  VALUES( 2, 'Black Olives', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING
+  VALUES( 2, 'Roma tomato', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING
+  VALUES( 2, 'Mushrooms', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING
+  VALUES( 2, 'Banana Peppers', FALSE);
+
+
+INSERT INTO PIZZA_USE_DISCOUNT
+  VALUES(2, 2);
+
+INSERT INTO PIZZA_USE_DISCOUNT
+  VALUES(4, 2);
+
+/*second part of order*/
+
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(3, 1.40, 6.75, 1);
+
+
+INSERT INTO DINE_IN(Order_id, Table_num)
+  VALUES(3, 4);
+
+INSERT INTO SEATS(Order_id, Seat_nums)
+  VALUES( 3, 2);
+
+
+INSERT INTO PIZZA
+  VALUES(3, 'March 3rd at 12:05PM', 6.75, 1.40, 1, 3, 2);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 3, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 3, 'Chicken', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 3, 'Banana Peppers', FALSE);
+
+/*End ORDER 2*/
+
+/*Order 3 (3rd paragraph of orders)*/
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(4, 19.80, 64.50, 2);
+
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO PICKUP(Order_id, Cust_id)
+  VALUES(4, 1);
+
+
+INSERT INTO PIZZA
+  VALUES(4, 'March 3rd at 9:30PM', 10.75, 3.30, 1, 4, 10);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 4, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 4, 'Pepperoni', FALSE);
+/* should we add his address or update it later? hes the next order again
+--this is gross can we just combine address?
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', 115, 'Party Blvd', 'Anderson', '29621', 'SC');
+*/
+
+
+/*End ORDER 3*/
+
+/*Start Order 4*/
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(5, 16.86, 45.50, 3);
+
+
+INSERT INTO DELIVERY(Order_id, Cust_id)
+  VALUES(5, 1); /*might need to update his address*/
+
+INSERT INTO PIZZA
+  VALUES(5, 'March 5th at 7:11PM', 14.50, 5.59, 1, 5, 14);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 5, 'Pepperoni', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 5, 'Sausage', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 5, 'Four Cheese Blend', FALSE);
+
+INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
+  VALUES(6, 'March 5th at 7:11PM', 17.00, 5.59, 1, 5, 14);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 6, 'Ham', TRUE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 6, 'Pineapple', TRUE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 6, 'Four Cheese Blend', FALSE);
+
+INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
+  VALUES(7, 'March 5th at 7:11PM', 14.00, 5.68, 1, 5, 14);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 7, 'Jalapenos', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 7, 'Bacon', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 7, 'Four Cheese Blend', FALSE);
+
+/*use his previous customer, maybe update or just add his addres originally?
+--this is gross can we just combine address?
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( , '', '', '', , '', '', '', '');*/
+
+
+
+INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+  VALUES( 4, 6);
+
+INSERT INTO ORDER_USE_DISCOUNT(Discount_id, Order_id)
+  VALUES( 5, 5);
+
+/*End Order 4*/
+
+/*Order 5 */
+
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(6, 7.85, 16.85, 2);
+
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( 2, 'Matt', 'Engers', '8644749953', NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO PICKUP(Order_id, Cust_id)
+  VALUES(6, 2);
+
+INSERT INTO PIZZA
+  VALUES(8, 'March 2nd at 5:30PM', 16.85, 7.85, 1, 6, 16);
+
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Green Pepper', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Onion', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Roma tomato', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Mushrooms', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Black Olives', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 8, 'Goat Cheese', FALSE);
+
+
+INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+  VALUES(4, 8);
+
+/*End Order 5*/
+
+/*Order 6*/
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(7, 3.20, 13.25, 3);
+
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES(3, 'Frank', 'Turner', '8642328944', 6745, 'Wessex St', 'Anderson', '29621', 'SC');
+
+INSERT INTO DELIVERY(Order_id, Cust_id)
+  VALUES(7, 3);
+
+INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
+  VALUES(9, 'March 2nd 6:17PM', 13.25, 3.20, 1, 7, 9);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 9, 'Chicken', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 9, 'Green Pepper', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 9, 'Onion', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 9, 'Mushrooms', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 9, 'Four Cheese Blend', FALSE);
+
+/*End Order 6*/
+
+/*Order 7*/
+INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
+  VALUES(8, 6.30, 24.00, 3);
+
+INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+  VALUES( 4, 'Milo', 'Auckerman', '8648785679', 8879, 'Suburban Home', 'Anderson', '29621', 'SC');
+
+INSERT INTO DELIVERY(Order_id, Cust_id)
+  VALUES(8, 4);
+
+INSERT INTO PIZZA
+  VALUES( 10, 'March 6th at 8:32PM', 12, 3.75, 1, 8, 9);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 10, 'Four Cheese Blend', TRUE);
+
+INSERT INTO PIZZA
+  VALUES( 11, 'March 6th at 8:32PM', 12, 2.55, 1, 8, 9);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 11, 'Regular Cheese', FALSE);
+
+INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
+  VALUES( 11, 'Pepperoni', TRUE);
+
+
+INSERT INTO ORDER_USE_DISCOUNT(Discount_id, Order_id)
+  VALUES( 1, 8);
+
+/*End Order 7*/
