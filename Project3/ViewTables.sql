@@ -1,3 +1,9 @@
+/*
+   Project 3 - CPSC 4620
+   Blake Washburn
+   Andrew Soby
+*/
+
 SELECT *
 FROM PIZZA;
 
