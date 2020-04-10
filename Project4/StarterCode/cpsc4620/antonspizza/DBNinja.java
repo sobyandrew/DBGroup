@@ -21,11 +21,11 @@ This class also has static string variables for pickup, delivery and dine-in. If
 
 public final class DBNinja {
     //enter your user name here
-    private static String user = "";
+    private static String user = "AntnPzDB_4nnj";
     //enter your password here
-    private static String password = "";
+    private static String password = "Onlineclass2020*";
     //enter your database name here
-    private static String database_name = "";
+    private static String database_name = "AntonPizzaDB_n3kq";
     //Do not change the port. 3306 is the default MySQL port
     private static String port = "3306";
     private static Connection conn;
@@ -308,7 +308,7 @@ public final class DBNinja {
 	We don't need to open and close the connection in these, since they are only called by a function that has opened the connection and will close it after
 	*/
 
-	
+
     private static Topping getTopping(int ID) throws SQLException, IOException
     {
 
@@ -326,10 +326,10 @@ public final class DBNinja {
 					String tname = rset.getString(1);
 					double price = rset.getDouble(2);
 					double inv = rset.getDouble(3);
-					
+
 					t = new Topping(tname, price, inv, ID);
 			}
-			
+
 		}
 		catch (SQLException e) {
             System.out.println("Error loading Topping");
@@ -342,7 +342,7 @@ public final class DBNinja {
             conn.close();
             return t;
         }
-		
+
         return t;
 
     }
