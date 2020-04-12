@@ -58,7 +58,8 @@ public final class DBNinja {
         try
         {
             Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
+        } 
+        catch (ClassNotFoundException e) {
             System.out.println ("Could not load the driver");
 
             System.out.println("Message     : " + e.getMessage());
@@ -116,7 +117,21 @@ public final class DBNinja {
 		/*add code to add the customer to the DB.
 		Note: the ID will be -1 and will need to be replaced to be a fitting primary key
 		Note that the customer is an ICustomer data type, which means c could be a dine in, carryout or delivery customer
-		*/
+        */
+        
+     
+        // Cast the customer and handle as appropriate
+        if(c instanceof DeliveryCustomer){
+            DeliveryCustomer cust = (DeliveryCustomer) c; 
+
+        }else if(c instanceof DineOutCustomer){
+            DineOutCustomer cust = (DineOutCustomer) c;
+
+        }else if(c instanceof DineInCustomer){
+            DineInCustomer cust = (DineInCustomer) c;
+
+        }
+    
 
         conn.close();
     }
@@ -149,7 +164,7 @@ public final class DBNinja {
     public static void AddToInventory(Topping t, double toAdd) throws SQLException, IOException
     {
         connect_to_db();
-		/*add code to add toAdd to the inventory level of T. This is not adding a new topping, it is adding a certain amount of stock for a topping. This would be used to show that an order was made to replenish the restaurants supply of pepperoni, etc*/
+		/*add code to add to the inventory level of T. This is not adding a new topping, it is adding a certain amount of stock for a topping. This would be used to show that an order was made to replenish the restaurants supply of pepperoni, etc*/
         conn.close();
     }
 
@@ -175,6 +190,8 @@ public final class DBNinja {
         connect_to_db();
         ArrayList<Topping> ts = new ArrayList<Topping>();
         //create a string with out query, this one is an easy one
+
+        // May need to replace the "Topping_ID" below with "Name" below as I think out database uses that as the primary key
         String query = "Select Topping_ID From TOPPING;";
 
         Statement stmt = conn.createStatement();
@@ -214,7 +231,6 @@ public final class DBNinja {
             conn.close();
             return ts;
         }
-
 
         //end by closing the connection
         conn.close();
@@ -289,8 +305,35 @@ public final class DBNinja {
         ArrayList<ICustomer> custs = new ArrayList<ICustomer>();
         connect_to_db();
         //add code to get a list of all customers
-
-
+        String query = "SELECT * FROM CUSTOMER";
+        Statement stmt = conn.createStatement();
+        try {
+            ResultSet rset = stmt.executeQuery(query);
+            //even if you only have one result, you still need to call ResultSet.next() to load the first tuple
+            while(rset.next())
+            {
+                int custID = rset.getInt(1);
+                String fName = rset.getString(2);
+                String lName = rset.getString(3);
+                String phoneNum = rset.getString(4);
+                int houseNum = rset.getInt(5);
+                String streetName = rset.getString(6);
+                String city = rset.getString(7);
+                String zip = rset.getString(8);             // Should this be an int?
+                String state = rset.getString(9);   
+                
+                /* Complile these into a customer object and add to ArrayList of customers. How do we cast this, because we dont know if the customer is dine in or carry out? */
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Topping");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return custs;
+        }
 
         conn.close();
         return custs;
@@ -311,11 +354,12 @@ public final class DBNinja {
 
     private static Topping getTopping(int ID) throws SQLException, IOException
     {
-
+        connect_to_db();
         //add code to get a topping
 		//the java compiler on unix does not like that t could be null, so I created a fake topping that will be replaced
         Topping t = new Topping("fake", 0.25, 100.0, -1);
-		String query = "Select Topping_Name, Topping_Price, Inventory_Level From TOPPING where Topping_ID = " + ID + ";";
+        String query = "Select Topping_Name, Topping_Price, Inventory_Level From TOPPING where Topping_ID = " + ID + ";";
+        /* ^ Not sure why we are not asking for more information, like what size topping we need to use */
 
         Statement stmt = conn.createStatement();
         try {
@@ -329,7 +373,6 @@ public final class DBNinja {
 
 					t = new Topping(tname, price, inv, ID);
 			}
-
 		}
 		catch (SQLException e) {
             System.out.println("Error loading Topping");
@@ -337,61 +380,149 @@ public final class DBNinja {
                 System.out.println("Message     : " + e.getMessage());
                 e = e.getNextException();
             }
-
-            //don't leave your connection open!
             conn.close();
             return t;
         }
-
+        conn.close();
         return t;
 
     }
-/*
-    private static Discount getDiscount()  throws SQLException, IOException
+
+    /* The last three functions  originally didnt come with any parameters, so I added one. The funtions did not make since without a parameter like topping had */
+    /* I dont think any of the following statement use Prepared Statements, and I think we need to use those */ 
+
+    private static Discount getDiscount(int ID)  throws SQLException, IOException
     {
+        // Create temporary fake discount
+        connect_to_db();
+        Discount D = new Discount("fake", 0.0, 0.0, 0)
+        String query = "SELECT Discount_id, Name FROM DISCOUNT WHERE Discount_id = " + ID + ";";
+        /* ^ Do we still need to select the discount_id in this statement? Also, how do we get information from its subclasses (percent_off and dollar amount off), should we do a cast kind of thing as in addCustomer? */
+        
+        Statement stmt = conn.createStatement();
+        try {
+            ResultSet rset = stmt.executeQuery(query);
+            while(rset.next()) {
+                int discountID = rset.getInt(1);
+                String name = rset.getString(2)
 
-        //add code to get a discount
-
-        Discount D;
-
+                D = new Discount(discountID, name);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Discount");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return D;
+        }
+        conn.close();
         return D;
-
     }
 
-    private static Pizza getPizza()  throws SQLException, IOException
-    {
 
+    private static Pizza getPizza(int ID)  throws SQLException, IOException
+    {
         //add code to get Pizza Remember, a Pizza has toppings and discounts on it
-        Pizza P;
+        connect_to_db();
+        /* The nulls below are in place of ArrayLists, so they might cause errors */
+        Pizza P = new Pizza(1, "fake", "fake", null, null, 0.0)
+        String query = "SELECT * FROM PIZZA WHERE Pizza_id = " + ID + ";";
 
+        Statement stmt = conn.createStatement();
+        try {
+            ResultSet rset = stmt.executeQuery(query)
+            while(rset.next()) {
+                int pizzaID = rset.getInt(1);
+                String timestamp = rset.getString(2);       // What kind of object do we want to store a timestamp in? Or do we even need to?
+                double price = rset.getDouble(3);
+                double busCost = rset.getDouble(4);
+                int status = rset.getInt(5); 
+                int orderID = rset.getInt(6);
+                int basePriceID = rset.getInt(7);
+
+                /* The database we have is different from what he has in Pizza.java, So i just included the attributes that are in Pizza.java */
+                /* We need to get the crust and size of the pizza somehow, because its not in our database from Pizza */
+                /* I think we also have to get the topping list and the discount list from the database somehow */
+
+                P = new Pizza(pizzaID, "crust", "size", basePriceID)
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Pizza");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return P;
+        }
+        conn.close();
         return P;
-
     }
 
-    private static ICustomer getCustomer()  throws SQLException, IOException
+    
+    private static ICustomer getCustomer(ID)  throws SQLException, IOException
     {
-
+        connect_to_db();
         //add code to get customer
 
-
+        /* QUESTION: How do we know what type of customer we are going to get for casting before we do a search? I dont know what to set iCustomer = to before we run the query*/
         ICustomer C;
+        String query = "SELECT * FROM CUSTOMER WHERE Customer_id = " + ID + ";";
 
+        Statement stmt = conn.createStatement();
+        try {
+            ResultSet rset = stmt.executeQuery(query)
+            while(rset.next()) {
+                /* I dont really know what to put here */
+                break;
+                // C = ?
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error running getCustomer");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return C;
+        }
+        conn.close();
         return C;
-
-
     }
 
-    private static Order getOrder()  throws SQLException, IOException
+    private static Order getOrder(ID)  throws SQLException, IOException
     {
-
+        connect_to_db();
         //add code to get an order. Remember, an order has pizzas, a customer, and discounts on it
+        /* Below there are nulls for customer and Arraylists, so that might throw an error */
+        Order O = new Order(0, null, "fake", null, null);
+        String query = "SELECT * FROM ORDER WHERE Order_id = " + ID + ";";
 
-
-        Order O;
-
+        Statement stmt = conn.createStatement();
+        try {
+            ResultSet rset = stmt.executeQuery(query)
+            while(rset.next()) {
+                int orderID = rset.getInt(1);
+                double busCost = rset.getDouble(2);
+                double custCost = rset.getDouble(3);
+                int diningStatus = rset.getInt(4);
+                // O = new Order(...);      We need to get the ArrayLists and customer here before we can set O to a new order
+        }
+        catch (SQLException e) {
+            System.out.println("Error running getCustomer");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return O;
+        }
+        conn.close();
         return O;
-
     }
-    */
-
 }
