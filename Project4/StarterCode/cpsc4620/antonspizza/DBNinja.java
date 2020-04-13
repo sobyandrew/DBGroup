@@ -46,6 +46,8 @@ public final class DBNinja {
     public final static String crust_gf = "Gluten-Free";
 
     private static int currentCustID = 5;
+    private static int currentOrder = 9;
+    private static int currentPizza = 17;
 
 
 
@@ -87,6 +89,7 @@ public final class DBNinja {
     public static void addOrder(Order o) throws SQLException, IOException
     {
         connect_to_db();
+
 		/* add code to add the order to the DB. Remember to add the pizzas and discounts as well, which will involve multiple tables. Customer should already exist. Toppings will need to be added to the pizzas.
 
 		It may be beneficial to define more functions to add an individual pizza to a database, add a topping to a pizza, etc.
@@ -100,8 +103,28 @@ public final class DBNinja {
 		You do not need to check to see if you have the topping in stock before adding to a pizza. You can just let it go negative.
 		*/
 
+       //get pizza from order and get discount
+       PreparedStatement p = conn.prepareStatement("INSERT INTO ORDER_ VALUES(?, ?, ?, ?)");
+       p.clearParameters();
+       p.setInt(1, currentOrder);
+       currentOrder++;
+       p.setDouble(2, -1);
+       p.setDouble(3, o.calcPrice());
+       int orderStatus= 0;
+       if(o.getType() == pickup){
+         orderStatus = 2;
+       }
+       else if (o.getType() == dine_in){
+         orderStatus = 1;
+       }
+       else
+       {
+         orderStatus = 3;
+       }
 
-        conn.close();
+       p.setInt(4, orderStatus);
+       int r = p.executeUpdate();
+       conn.close();
 
     }
 
@@ -349,6 +372,18 @@ public final class DBNinja {
     {
         connect_to_db();
         double bp = 0.0;
+        PreparedStatement p = conn.prepareStatement("SELECT Price FROM BASE_PRICE WHERE Size = ? AND Crust_type = ?"); // might add distinct
+        p.clearParameters();
+        p.setString(1, size);
+        p.setString(2, crust);
+
+        ResultSet rset = p.executeQuery();
+
+        while(rset.next())
+        {
+          bp = rset.getDouble(1);
+        }
+
         //add code to get the base price for that size and crust pizza Depending on how you store size and crust in your database, you may have to do a conversion
 
         conn.close();
@@ -367,7 +402,8 @@ public final class DBNinja {
         ArrayList<Discount> discs = new ArrayList<Discount>();
         connect_to_db();
         //add code to get a list of all discounts
-
+        // PreparedStatement p = conn.prepareStatement("SELECT * FROM BASE_PRICE WHERE Size = ? AND Crust_type = ?"); // might add distinct
+        // p.clearParameters();
 
         conn.close();
         return discs;
@@ -380,6 +416,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures the list contains all carryout and delivery customers in the database
      */
+     //done this function
     public static ArrayList<ICustomer> getCustomerList() throws SQLException, IOException
     {
         ArrayList<ICustomer> custs = new ArrayList<ICustomer>();
@@ -396,12 +433,15 @@ public final class DBNinja {
                 String fName = rset.getString(2);
                 String lName = rset.getString(3);
                 String phoneNum = rset.getString(4);
-                int houseNum = rset.getInt(5);
-                String streetName = rset.getString(6);
-                String city = rset.getString(7);
-                String zip = rset.getString(8);             // Should this be an int?
-                String state = rset.getString(9);
+                String address = rset.getString(5);
+                DeliveryCustomer cust = new DeliveryCustomer(custID, (fName + " " + lName), phoneNum, address);
+                // int houseNum = rset.getInt(5);
+                // String streetName = rset.getString(6);
+                // String city = rset.getString(7);
+                // String zip = rset.getString(8);             // Should this be an int?
+                // String state = rset.getString(9);
 
+                custs.add(cust);
                 /* Complile these into a customer object and add to ArrayList of customers. How do we cast this, because we dont know if the customer is dine in or carry out? */
             }
         }
