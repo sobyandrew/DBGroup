@@ -132,6 +132,28 @@ public final class DBNinja {
 
        for(Pizza pz : pizzas)
        {
+          PreparedStatement p2 = conn.prepareStatement("INSERT INTO PIZZA VALUES(?, ?, ?, ?, ?, ?, ?)");
+          p2.clearParameters();
+          p2.setInt(1, currentPizza);
+          currentPizza++; //FIXME: gain global call fix this
+          p2.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+          p2.setDouble(3, pz.calcPrice());
+          p2.setDouble(4, 0.0);
+          p2.setInt(5, 0); //not complete status
+          p2.setInt(6,currentOrder - 1);
+          p2.setDouble(7, 1); // FIXME this is Base_price_id need to update
+          int r2 = p2.executeUpdate();
+          //base price id = (size*4) + crust;
+          //can use this to get basePriceid
+          // public final static String size_s = "Small"; = 0
+          // public final static String size_m = "Medium"; = 1
+          // public final static String size_l = "Large"; =2
+          // public final static String size_xl = "X-Large"; =3
+          //
+          // public final static String crust_thin = "Thin"; =1
+          // public final static String crust_orig = "Original"; =2
+          // public final static String crust_pan = "Pan";=3
+          // public final static String crust_gf = "Gluten-Free";=4
           //insert into PIZZA(ID, timestamp, price, cost, status, orderID, basePrice)
           System.out.println(pz.toString());
           ArrayList<Topping> toppings = pz.getToppings();
