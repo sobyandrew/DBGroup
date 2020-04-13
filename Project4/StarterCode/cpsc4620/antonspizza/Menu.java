@@ -240,7 +240,7 @@ public class Menu {
 
 
          ***********************************************************************************/
-        System.out.println("Please Enter the Customer phone number: ");
+        System.out.println("Please Enter the Customer phone number with only numbers and no other characters: ");
         String phone = reader.readLine();
 
         ICustomer new_cust;

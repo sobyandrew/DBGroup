@@ -45,6 +45,8 @@ public final class DBNinja {
     public final static String crust_pan = "Pan";
     public final static String crust_gf = "Gluten-Free";
 
+    private static int currentCustID = 5;
+
 
 
     /**
@@ -122,15 +124,37 @@ public final class DBNinja {
 
         // Cast the customer and handle as appropriate
         if(c instanceof DeliveryCustomer){
+          //INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
+            //VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', 115, 'Party Blvd', 'Anderson', '29621', 'SC');
             DeliveryCustomer cust = (DeliveryCustomer) c;
+            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, 'test', ?,?)");
+            p.clearParameters();
+            p.setInt(1, currentCustID); //FIXME: just did a private global var bad practice change?
+            currentCustID++;
+            p.setString(2, cust.getName());
+            p.setString(3, cust.getPhone());
+            p.setString(4, cust.getAddress());
+            int r = p.executeUpdate();
+
+            //DeliveryCustomer cust = (DeliveryCustomer) c;
 
         }else if(c instanceof DineOutCustomer){
             DineOutCustomer cust = (DineOutCustomer) c;
-
-        }else if(c instanceof DineInCustomer){
-            DineInCustomer cust = (DineInCustomer) c;
-
+            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, 'test', ?, NULL)");
+            p.clearParameters();
+            p.setInt(1, currentCustID); //FIXME: just did a private global var bad practice change?
+            currentCustID++;
+            p.setString(2, cust.getName());
+            p.setString(3, cust.getPhone());
+            int r = p.executeUpdate();
         }
+
+
+        //dont have dine in customer
+        // }else if(c instanceof DineInCustomer){
+        //     DineInCustomer cust = (DineInCustomer) c;
+
+        //}
 
 
         conn.close();
@@ -170,7 +194,7 @@ public final class DBNinja {
         p.clearParameters();
         p.setDouble(1,toAdd);
         p.setInt(2, t.getID());
-
+        //need to try catch
         int r = p.executeUpdate();
 
         conn.close();
@@ -257,8 +281,56 @@ public final class DBNinja {
         connect_to_db();
 
         ArrayList<Order> os = new ArrayList<Order>();
+        Order addo = new Order(-1, null, "-1");
 		/*add code to get a list of all open orders. Only return Orders that have not been completed. If any pizzas are not completed, then the order is open.*/
+      //select orderID from Pizza Where Status == 0 (not complete)
 
+        PreparedStatement p = conn.prepareStatement("SELECT PIZZA.Order_id, Dining_status FROM PIZZA JOIN ORDER_ ON PIZZA.Order_id = ORDER_.Order_id WHERE Status = ?"); // might add distinct
+        p.clearParameters();
+        p.setInt(1, 0); // setting status to 0 its not completed yet where 1 is completed
+
+        ResultSet rset = p.executeQuery();
+
+        // public Order(int i, ICustomer c, String type)
+        // {
+        //     ID = i;
+        //     cust = c;
+        //     order_type = type;
+        //     pizzas = new ArrayList<Pizza>();
+        //     discounts = new ArrayList<Discount>();
+        // }
+        while(rset.next())
+        {
+          //ICustomer cust;
+          int order = rset.getInt(1);
+          int dining = rset.getInt(2);
+          String status ="";
+          //this is needed to get the customer data
+          if(dining == 1)
+          {
+            DineInCustomer cust = new DineInCustomer(1, null, 1);
+            status = dine_in;
+            //prepared statement for dine in cust
+            addo = new Order(order, cust, status);
+          }
+          else if(dining == 2){
+
+            DineOutCustomer cust = new DineOutCustomer(1, "test", "testphone");
+            status = pickup;
+            //prepared statement for pickupcus
+            addo = new Order(order, cust, status);
+          }
+          else{
+            DeliveryCustomer cust = new DeliveryCustomer(-1, "fname", "lname", "address");
+            status = delivery;
+            //prepared statement for deliverycust
+            addo = new Order(order, cust, status);
+          }
+          // PreparedStatement p2 = conn.prepareStatement("SELECT * FROM ORDER WHERE Status = ?"); // might add distinct
+          // p.clearParameters();
+        //  add = new Order(order, cust, status);
+          os.add(addo);
+        }
         conn.close();
         return os;
     }

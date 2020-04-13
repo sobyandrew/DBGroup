@@ -56,11 +56,12 @@ CREATE TABLE CUSTOMER
   Fname VARCHAR(20) NOT NULL,
   Lname VARCHAR(20) NOT NULL,
   Phone_num VARCHAR(10) NOT NULL,
-  House_num INT,
+  Address VARCHAR(100),
+  /*House_num INT,
   Street_name VARCHAR(20),
   City VARCHAR(20),
   Zipcode CHAR(6),
-  State CHAR(2),
+  State CHAR(2),*/
   CONSTRAINT CUSTOMERPK
     PRIMARY KEY(Customer_id));
 
