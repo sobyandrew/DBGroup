@@ -58,7 +58,7 @@ public final class DBNinja {
         try
         {
             Class.forName("com.mysql.jdbc.Driver");
-        } 
+        }
         catch (ClassNotFoundException e) {
             System.out.println ("Could not load the driver");
 
@@ -118,11 +118,11 @@ public final class DBNinja {
 		Note: the ID will be -1 and will need to be replaced to be a fitting primary key
 		Note that the customer is an ICustomer data type, which means c could be a dine in, carryout or delivery customer
         */
-        
-     
+
+
         // Cast the customer and handle as appropriate
         if(c instanceof DeliveryCustomer){
-            DeliveryCustomer cust = (DeliveryCustomer) c; 
+            DeliveryCustomer cust = (DeliveryCustomer) c;
 
         }else if(c instanceof DineOutCustomer){
             DineOutCustomer cust = (DineOutCustomer) c;
@@ -131,7 +131,7 @@ public final class DBNinja {
             DineInCustomer cust = (DineInCustomer) c;
 
         }
-    
+
 
         conn.close();
     }
@@ -165,6 +165,14 @@ public final class DBNinja {
     {
         connect_to_db();
 		/*add code to add to the inventory level of T. This is not adding a new topping, it is adding a certain amount of stock for a topping. This would be used to show that an order was made to replenish the restaurants supply of pepperoni, etc*/
+        //pretty sure this should add to inventory
+        PreparedStatement p = conn.prepareStatement("UPDATE TOPPING SET Inventory = Inventory + ? WHERE ID = ?");
+        p.clearParameters();
+        p.setDouble(1,toAdd);
+        p.setInt(2, t.getID());
+
+        int r = p.executeUpdate();
+
         conn.close();
     }
 
@@ -192,7 +200,7 @@ public final class DBNinja {
         //create a string with out query, this one is an easy one
 
         // May need to replace the "Topping_ID" below with "Name" below as I think out database uses that as the primary key
-        String query = "Select Topping_ID From TOPPING;";
+        String query = "Select ID From TOPPING;";
 
         Statement stmt = conn.createStatement();
         try {
@@ -320,8 +328,8 @@ public final class DBNinja {
                 String streetName = rset.getString(6);
                 String city = rset.getString(7);
                 String zip = rset.getString(8);             // Should this be an int?
-                String state = rset.getString(9);   
-                
+                String state = rset.getString(9);
+
                 /* Complile these into a customer object and add to ArrayList of customers. How do we cast this, because we dont know if the customer is dine in or carry out? */
             }
         }
@@ -358,7 +366,7 @@ public final class DBNinja {
         //add code to get a topping
 		//the java compiler on unix does not like that t could be null, so I created a fake topping that will be replaced
         Topping t = new Topping("fake", 0.25, 100.0, -1);
-        String query = "Select Topping_Name, Topping_Price, Inventory_Level From TOPPING where Topping_ID = " + ID + ";";
+        String query = "Select Name, Price, Inventory From TOPPING where ID = " + ID + ";";
         /* ^ Not sure why we are not asking for more information, like what size topping we need to use */
 
         Statement stmt = conn.createStatement();
@@ -389,24 +397,25 @@ public final class DBNinja {
     }
 
     /* The last three functions  originally didnt come with any parameters, so I added one. The funtions did not make since without a parameter like topping had */
-    /* I dont think any of the following statement use Prepared Statements, and I think we need to use those */ 
+    /* I dont think any of the following statement use Prepared Statements, and I think we need to use those */
 
     private static Discount getDiscount(int ID)  throws SQLException, IOException
     {
         // Create temporary fake discount
         connect_to_db();
-        Discount D = new Discount("fake", 0.0, 0.0, 0)
+        Discount D = new Discount("fake", 0.0, 0.0, 0);
         String query = "SELECT Discount_id, Name FROM DISCOUNT WHERE Discount_id = " + ID + ";";
         /* ^ Do we still need to select the discount_id in this statement? Also, how do we get information from its subclasses (percent_off and dollar amount off), should we do a cast kind of thing as in addCustomer? */
-        
+
         Statement stmt = conn.createStatement();
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
                 int discountID = rset.getInt(1);
-                String name = rset.getString(2)
+                String name = rset.getString(2);
 
-                D = new Discount(discountID, name);
+              //  D = new Discount(discountID, name);
+               D = new Discount(name, 1.0, 1.0, discountID);
             }
         }
         catch (SQLException e) {
@@ -428,18 +437,19 @@ public final class DBNinja {
         //add code to get Pizza Remember, a Pizza has toppings and discounts on it
         connect_to_db();
         /* The nulls below are in place of ArrayLists, so they might cause errors */
-        Pizza P = new Pizza(1, "fake", "fake", null, null, 0.0)
+        //Pizza P = new Pizza(1, "fake", "fake", null, null, 0.0);
+        Pizza P = new Pizza(1, "fake", "fake", 0.0);
         String query = "SELECT * FROM PIZZA WHERE Pizza_id = " + ID + ";";
 
         Statement stmt = conn.createStatement();
         try {
-            ResultSet rset = stmt.executeQuery(query)
+            ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
                 int pizzaID = rset.getInt(1);
                 String timestamp = rset.getString(2);       // What kind of object do we want to store a timestamp in? Or do we even need to?
                 double price = rset.getDouble(3);
                 double busCost = rset.getDouble(4);
-                int status = rset.getInt(5); 
+                int status = rset.getInt(5);
                 int orderID = rset.getInt(6);
                 int basePriceID = rset.getInt(7);
 
@@ -447,7 +457,8 @@ public final class DBNinja {
                 /* We need to get the crust and size of the pizza somehow, because its not in our database from Pizza */
                 /* I think we also have to get the topping list and the discount list from the database somehow */
 
-                P = new Pizza(pizzaID, "crust", "size", basePriceID)
+                //crust and size can be obtained from basePrice ID
+                //P = new Pizza(pizzaID, "crust", "size", basePriceID);
             }
         }
         catch (SQLException e) {
@@ -463,19 +474,19 @@ public final class DBNinja {
         return P;
     }
 
-    
-    private static ICustomer getCustomer(ID)  throws SQLException, IOException
+
+    private static ICustomer getCustomer(int ID)  throws SQLException, IOException
     {
         connect_to_db();
         //add code to get customer
 
         /* QUESTION: How do we know what type of customer we are going to get for casting before we do a search? I dont know what to set iCustomer = to before we run the query*/
-        ICustomer C;
+        ICustomer C = new DeliveryCustomer(-1, "test","test", "test");
         String query = "SELECT * FROM CUSTOMER WHERE Customer_id = " + ID + ";";
 
         Statement stmt = conn.createStatement();
         try {
-            ResultSet rset = stmt.executeQuery(query)
+            ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
                 /* I dont really know what to put here */
                 break;
@@ -495,22 +506,24 @@ public final class DBNinja {
         return C;
     }
 
-    private static Order getOrder(ID)  throws SQLException, IOException
+    private static Order getOrder(int ID)  throws SQLException, IOException
     {
         connect_to_db();
         //add code to get an order. Remember, an order has pizzas, a customer, and discounts on it
         /* Below there are nulls for customer and Arraylists, so that might throw an error */
-        Order O = new Order(0, null, "fake", null, null);
+        //Order O = new Order(0, null, "fake", null, null);
+        Order O = new Order(0, null, "fake");
         String query = "SELECT * FROM ORDER WHERE Order_id = " + ID + ";";
 
         Statement stmt = conn.createStatement();
         try {
-            ResultSet rset = stmt.executeQuery(query)
+            ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
                 int orderID = rset.getInt(1);
                 double busCost = rset.getDouble(2);
                 double custCost = rset.getDouble(3);
                 int diningStatus = rset.getInt(4);
+              }
                 // O = new Order(...);      We need to get the ArrayLists and customer here before we can set O to a new order
         }
         catch (SQLException e) {

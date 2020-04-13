@@ -25,11 +25,12 @@ CREATE TABLE BASE_PRICE
   CONSTRAINT BASE_PRICEPK
     PRIMARY KEY(Base_price_id));
 
-CREATE TABLE TOPPINGS
-  (Name          VARCHAR(40) NOT NULL,
+CREATE TABLE TOPPING /*should change PK to ID and all references after*/
+  (ID            INT NOT NULL,
+  Name           VARCHAR(40) NOT NULL,
   Price          DECIMAL(4,2) NOT NULL,
   Cost_per_unit  DECIMAL(4,2) NOT NULL,
-  Inventory      INT NOT NULL,
+  Inventory      DOUBLE NOT NULL, /*Change this from decimal to double*/
   Small          DECIMAL(3,2),
   Medium         DECIMAL(3,2),
   Large          DECIMAL(3,2),
@@ -47,7 +48,7 @@ CREATE TABLE PIZZA_CONTAINS_TOPPING
     FOREIGN KEY(Pizza_id) REFERENCES PIZZA(Pizza_id)
     ON UPDATE CASCADE     ON DELETE CASCADE,
   CONSTRAINT PIZ_CON_TOP_NAME_FK
-    FOREIGN KEY(Topping_name) REFERENCES TOPPINGS(Name)
+    FOREIGN KEY(Topping_name) REFERENCES TOPPING(Name)
     ON UPDATE CASCADE     ON DELETE CASCADE);
 
 CREATE TABLE CUSTOMER
