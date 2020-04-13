@@ -108,7 +108,7 @@ public final class DBNinja {
        p.clearParameters();
        p.setInt(1, currentOrder);
        currentOrder++;
-       p.setDouble(2, -1);
+       p.setDouble(2, -1); // how do we calculate cost to business?
        p.setDouble(3, o.calcPrice());
        int orderStatus= 0;
        if(o.getType() == pickup){
@@ -124,6 +124,44 @@ public final class DBNinja {
 
        p.setInt(4, orderStatus);
        int r = p.executeUpdate();
+
+       //need to adjust inventory levels and check for extra topping
+
+       //add each pizza from order into db
+       ArrayList<Pizza> pizzas = o.getPizzas();
+
+       for(Pizza pz : pizzas)
+       {
+          //insert into PIZZA(ID, timestamp, price, cost, status, orderID, basePrice)
+          System.out.println(pz.toString());
+          ArrayList<Topping> toppings = pz.getToppings();
+          for(Topping t : toppings)
+          {
+            //insert into PIZZA_CONTAINS_TOPPING(id, topping name, bool)
+
+            //update the inventory in TOPPING WHERE Name = t.getName?
+          }
+
+          //pizza discounts
+          ArrayList<Discount> discounts = pz.getDiscounts();
+
+          for(Discount d: discounts)
+          {
+          //insert into PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+          }
+
+
+       }
+
+       ArrayList<Discount> orderDisc = o.getDiscounts();
+
+       for(Discount od : orderDisc){
+         //insert into ORDER_USE_DISCOUNT(Discount_id, Order_id)
+
+       }
+
+       //maybe need to add order discounts?
+
        conn.close();
 
     }
@@ -382,6 +420,7 @@ public final class DBNinja {
         while(rset.next())
         {
           bp = rset.getDouble(1);
+          System.out.println(bp);
         }
 
         //add code to get the base price for that size and crust pizza Depending on how you store size and crust in your database, you may have to do a conversion
@@ -402,8 +441,39 @@ public final class DBNinja {
         ArrayList<Discount> discs = new ArrayList<Discount>();
         connect_to_db();
         //add code to get a list of all discounts
-        // PreparedStatement p = conn.prepareStatement("SELECT * FROM BASE_PRICE WHERE Size = ? AND Crust_type = ?"); // might add distinct
-        // p.clearParameters();
+
+        //two prepared statements joining discount + PERCENTAGE_DISCOUNT and discount + DOLLAR_DISCOUNT
+        //first query
+        PreparedStatement p = conn.prepareStatement("SELECT Name, Amount_off, DD.Discount_id FROM DOLLAR_DISCOUNT AS DD NATURAL JOIN DISCOUNT;"); // might add distinct
+        p.clearParameters();
+
+        ResultSet rset = p.executeQuery();
+
+        while(rset.next())
+        {
+          String dName = rset.getString(1);
+          double cash = rset.getDouble(2);
+          int discID = rset.getInt(3);
+
+          Discount cashDisc = new Discount(dName, 0.0, cash, discID);
+          discs.add(cashDisc);
+        }
+
+        //second query
+        PreparedStatement p2 = conn.prepareStatement("SELECT Name, Percent_off, PD.Discount_id FROM PERCENTAGE_DISCOUNT AS PD NATURAL JOIN DISCOUNT;"); // might add distinct
+        p2.clearParameters();
+
+        ResultSet rset2 = p2.executeQuery();
+
+        while(rset2.next())
+        {
+          String dName2 = rset2.getString(1);
+          double percent = rset2.getDouble(2);
+          int discID2 = rset2.getInt(3);
+
+          Discount percentDisc = new Discount(dName2, percent/100.0, 0.0, discID2);
+          discs.add(percentDisc);
+        }
 
         conn.close();
         return discs;
