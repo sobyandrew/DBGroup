@@ -102,6 +102,7 @@ public final class DBNinja {
 
 		You do not need to check to see if you have the topping in stock before adding to a pizza. You can just let it go negative.
 		*/
+      //maybe call a select statement to get the orderId to start at using SELECT Order_id FROM ORDER_ ORDER BY Order_id DESC LIMIT 1; same with pizza id
 
        //get pizza from order and get discount
        PreparedStatement p = conn.prepareStatement("INSERT INTO ORDER_ VALUES(?, ?, ?, ?)");
@@ -111,15 +112,20 @@ public final class DBNinja {
        p.setDouble(2, -1); // how do we calculate cost to business?
        p.setDouble(3, o.calcPrice());
        int orderStatus= 0;
+
        if(o.getType() == pickup){
          orderStatus = 2;
+         //insert into PICKUP(Order_id, Cust_id)
+
        }
        else if (o.getType() == dine_in){
          orderStatus = 1;
+         //insert into dine_in and seats
        }
        else
        {
          orderStatus = 3;
+         //insert into Delivery(Order_id, Cust_id)
        }
 
        p.setInt(4, orderStatus);
@@ -141,27 +147,55 @@ public final class DBNinja {
           p2.setDouble(4, 0.0);
           p2.setInt(5, 0); //not complete status
           p2.setInt(6,currentOrder - 1);
-          p2.setDouble(7, 1); // FIXME this is Base_price_id need to update
+          //not done with prepared statement yet get baseID
+          //used to calcualte the baseId real quick
+          int crustBase = 0;
+          int sizeBase = 0;
+
+          //calc baseid
+          if(pz.getCrust() == crust_thin){
+            crustBase = 1;
+          } else if(pz.getCrust() == crust_orig)
+          {
+            crustBase = 2;
+          } else if(pz.getCrust() == crust_pan){
+            crustBase = 3;
+          } else {
+            crustBase = 4;
+          }
+          //calc base id
+          if(pz.getSize() == size_s){
+            sizeBase = 0;
+          } else if(pz.getSize() == size_m){
+            sizeBase = 1;
+          } else if(pz.getSize() == size_l){
+            sizeBase = 2;
+          } else{
+            sizeBase = 3;
+          }
+
+          p2.setInt(7, ((sizeBase*4) + crustBase));
           int r2 = p2.executeUpdate();
-          //base price id = (size*4) + crust;
-          //can use this to get basePriceid
-          // public final static String size_s = "Small"; = 0
-          // public final static String size_m = "Medium"; = 1
-          // public final static String size_l = "Large"; =2
-          // public final static String size_xl = "X-Large"; =3
-          //
-          // public final static String crust_thin = "Thin"; =1
-          // public final static String crust_orig = "Original"; =2
-          // public final static String crust_pan = "Pan";=3
-          // public final static String crust_gf = "Gluten-Free";=4
+
           //insert into PIZZA(ID, timestamp, price, cost, status, orderID, basePrice)
           System.out.println(pz.toString());
           ArrayList<Topping> toppings = pz.getToppings();
           for(Topping t : toppings)
           {
             //insert into PIZZA_CONTAINS_TOPPING(id, topping name, bool)
-
+            PreparedStatement p3 = conn.prepareStatement("INSERT INTO PIZZA_CONTAINS_TOPPING VALUES(?, ?, ?)");
+            p3.clearParameters();
+            p3.setInt(1,currentPizza -1);
+            p3.setString(2, t.getName());
+            p3.setBoolean(3, t.getExtra());
+            int r3 = p3.executeUpdate();
             //update the inventory in TOPPING WHERE Name = t.getName?
+
+            PreparedStatement p4 = conn.prepareStatement("UPDATE TOPPING SET Inventory = Inventory - ? WHERE Name = ?");
+            p4.clearParameters();
+            p4.setInt(1, 2); //do i need to do a select statement and get the size of it pls no
+            p4.setString(2, t.getName());
+            int r4 = p4.executeUpdate();
           }
 
           //pizza discounts
@@ -170,8 +204,12 @@ public final class DBNinja {
           for(Discount d: discounts)
           {
           //insert into PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
+            PreparedStatement p5 = conn.prepareStatement("INSERT INTO PIZZA_USE_DISCOUNT(?, ?)");
+            p5.clearParameters();
+            p5.setInt(1, d.getID());
+            p5.setInt(2, currentPizza -1);
+            int r5 = p5.executeUpdate();
           }
-
 
        }
 
@@ -179,6 +217,11 @@ public final class DBNinja {
 
        for(Discount od : orderDisc){
          //insert into ORDER_USE_DISCOUNT(Discount_id, Order_id)
+         PreparedStatement p6 = conn.prepareStatement("INSERT INTO ORDER_USE_DISCOUNT(?, ?)");
+         p6.clearParameters();
+         p6.setInt(1, od.getID());
+         p6.setInt(2, currentPizza -1);
+         int r6 = p6.executeUpdate();
 
        }
 
