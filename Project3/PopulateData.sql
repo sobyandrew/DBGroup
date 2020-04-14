@@ -230,8 +230,8 @@ INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
 INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(4, 19.80, 64.50, 2);
 
-INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, Address)/*House_num, Street_name, City, Zipcode, State)*/
-  VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', '115 Party Blvd, Anderson 29621, SC');
+INSERT INTO CUSTOMER(Customer_id, FullName, Phone_num, Address)/*House_num, Street_name, City, Zipcode, State)*/
+  VALUES( 1, 'Andrew Wilkes-Krier', '8642545861', '115 Party Blvd, Anderson 29621, SC');
 
 INSERT INTO PICKUP(Order_id, Cust_id)
   VALUES(4, 1);
@@ -380,8 +380,8 @@ INSERT INTO PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
 INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(7, 3.20, 13.25, 3);
 
-INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
-  VALUES(3, 'Frank', 'Turner', '8642328944', '6745 Wessex St, Anderson 29621, SC');
+INSERT INTO CUSTOMER(Customer_id, FullName, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
+  VALUES(3, 'Frank Turner', '8642328944', '6745 Wessex St, Anderson 29621, SC');
 
 INSERT INTO DELIVERY(Order_id, Cust_id)
   VALUES(7, 3);
@@ -409,8 +409,8 @@ INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
 INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(8, 6.30, 24.00, 3);
 
-INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
-  VALUES( 4, 'Milo', 'Auckerman', '8648785679', '8879 Suburban Home, Anderson 29621, SC');
+INSERT INTO CUSTOMER(Customer_id, FullName, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
+  VALUES( 4, 'Milo Auckerman', '8648785679', '8879 Suburban Home, Anderson 29621, SC');
 
 INSERT INTO DELIVERY(Order_id, Cust_id)
   VALUES(8, 4);
