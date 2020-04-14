@@ -126,7 +126,7 @@ public final class DBNinja {
        p.clearParameters();
        p.setInt(1, currentOrder);
        currentOrder++;
-       p.setDouble(2, -1); // how do we calculate cost to business?
+       p.setDouble(2, 2);   // just inserting a value of 2 for the business cost as his prompt states
        p.setDouble(3, o.calcPrice());
        int orderStatus= 0;
 
@@ -327,8 +327,6 @@ public final class DBNinja {
             p.setString(4, cust.getAddress());
             int r = p.executeUpdate();
 
-            //DeliveryCustomer cust = (DeliveryCustomer) c;
-
         }else if(c instanceof DineOutCustomer){
             DineOutCustomer cust = (DineOutCustomer) c;
             PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, 'test', ?, NULL)");
@@ -339,14 +337,6 @@ public final class DBNinja {
             p.setString(3, cust.getPhone());
             int r = p.executeUpdate();
         }
-
-
-        //dont have dine in customer
-        // }else if(c instanceof DineInCustomer){
-        //     DineInCustomer cust = (DineInCustomer) c;
-
-        //}
-
 
         conn.close();
     }
@@ -364,6 +354,12 @@ public final class DBNinja {
         connect_to_db();
 		/*add code to mark an order as complete in the DB. You may have a boolean field for this, or maybe a completed time timestamp. However you have it, */
 
+        /* TODO
+        //Get current order ID
+        //Search for all pizzas on the order
+        //Update the status of each Pizza
+        */
+
         conn.close();
     }
 
@@ -376,6 +372,7 @@ public final class DBNinja {
      * @requires t exists in the database and toAdd > 0
      * @ensures t's inventory level is increased by toAdd
      */
+    // WORKS
     public static void AddToInventory(Topping t, double toAdd) throws SQLException, IOException
     {
         connect_to_db();
@@ -385,9 +382,7 @@ public final class DBNinja {
         p.clearParameters();
         p.setDouble(1,toAdd);
         p.setInt(2, t.getID());
-        //need to try catch
         int r = p.executeUpdate();
-
         conn.close();
     }
 
@@ -407,6 +402,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures the returned list will include all toppings and accurate inventory levels
      */
+    // WORKS
     public static ArrayList<Topping> getInventory() throws SQLException, IOException
     {
         //start by connecting
@@ -437,7 +433,7 @@ public final class DBNinja {
 
 					NOTE: you can't check for NULL until after you have read the value using one of the getters.
 
-					*/
+                    */
                 int ID = rset.getInt(1);
                 //Now I'm just passing my primary key to this function to get the topping itself individually
                 ts.add(getTopping(ID));
@@ -566,6 +562,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures all discounts are included in the returned list
      */
+    // WORKS
     public static ArrayList<Discount> getDiscountList() throws SQLException, IOException
     {
         ArrayList<Discount> discs = new ArrayList<Discount>();
@@ -629,6 +626,7 @@ public final class DBNinja {
             //even if you only have one result, you still need to call ResultSet.next() to load the first tuple
             while(rset.next())
             {
+                // TODO: need to update the  naming convention for first name and last name in project 3 database and here in names. 
                 int custID = rset.getInt(1);
                 String fName = rset.getString(2);
                 String lName = rset.getString(3);
@@ -642,7 +640,6 @@ public final class DBNinja {
                 // String state = rset.getString(9);
 
                 custs.add(cust);
-                /* Complile these into a customer object and add to ArrayList of customers. How do we cast this, because we dont know if the customer is dine in or carry out? */
             }
         }
         catch (SQLException e) {
@@ -671,7 +668,7 @@ public final class DBNinja {
 	We don't need to open and close the connection in these, since they are only called by a function that has opened the connection and will close it after
 	*/
 
-
+    // WORKS
     private static Topping getTopping(int ID) throws SQLException, IOException
     {
         connect_to_db();
