@@ -46,8 +46,8 @@ public final class DBNinja {
     public final static String crust_gf = "Gluten-Free";
 
     private static int currentCustID = 5;
-    private static int currentOrder = 9;
-    private static int currentPizza = 17;
+    //private static int currentOrder = 9;
+    //private static int currentPizza = 17;
 
 
 
@@ -104,6 +104,23 @@ public final class DBNinja {
 		*/
       //maybe call a select statement to get the orderId to start at using SELECT Order_id FROM ORDER_ ORDER BY Order_id DESC LIMIT 1; same with pizza id
 
+      PreparedStatement getOrderNum = conn.prepareStatement("SELECT Order_id FROM ORDER_ ORDER BY Order_id DESC LIMIT 1");
+      getOrderNum.clearParameters();
+
+      ResultSet rsetOrder = getOrderNum.executeQuery();
+
+      rsetOrder.next();
+      int currentOrder = rsetOrder.getInt(1) + 1;
+      System.out.println(currentOrder); // delete this line
+
+      PreparedStatement getPizzaNum = conn.prepareStatement("SELECT Pizza_id FROM PIZZA ORDER BY PIZZA_id DESC LIMIT 1");
+      getPizzaNum.clearParameters();
+
+      ResultSet rsetPizza = getPizzaNum.executeQuery();
+
+      rsetPizza.next();
+
+      int currentPizza = rsetPizza.getInt(1) + 1;
        //get pizza from order and get discount
        PreparedStatement p = conn.prepareStatement("INSERT INTO ORDER_ VALUES(?, ?, ?, ?)");
        p.clearParameters();
@@ -114,22 +131,54 @@ public final class DBNinja {
        int orderStatus= 0;
 
        if(o.getType() == pickup){
+
          orderStatus = 2;
+         p.setInt(4, orderStatus);
+         int r = p.executeUpdate();
+         PreparedStatement pPick = conn.prepareStatement("INSERT INTO PICKUP VALUES(?, ?)");
+         pPick.clearParameters();
+         pPick.setInt(1, currentOrder -1);
+         pPick.setInt(2, (o.getCustomer()).getID());
+         int rPick = pPick.executeUpdate();
          //insert into PICKUP(Order_id, Cust_id)
 
        }
        else if (o.getType() == dine_in){
          orderStatus = 1;
+         p.setInt(4, orderStatus);
+         int r = p.executeUpdate();
          //insert into dine_in and seats
+         PreparedStatement pDine = conn.prepareStatement("INSERT INTO DINE_IN VALUES(?, ?)");
+         pDine.clearParameters();
+         pDine.setInt(1, currentOrder -1);
+         pDine.setInt(2, ((DineInCustomer) (o.getCustomer())).getTableNum());
+         int rDine = pDine.executeUpdate();
+
+         List<Integer> seats = ((DineInCustomer) (o.getCustomer())).getSeats();
+         for(int s : seats){
+           PreparedStatement pSeats = conn.prepareStatement("INSERT INTO SEATS VALUES(?, ?)");
+           pSeats.clearParameters();
+           pSeats.setInt(1, currentOrder -1);
+           pSeats.setInt(2, s);
+           int rSeats = pSeats.executeUpdate();
+
+         }
        }
        else
        {
          orderStatus = 3;
+         p.setInt(4, orderStatus);
+         int r = p.executeUpdate();
          //insert into Delivery(Order_id, Cust_id)
+         PreparedStatement pDeliv = conn.prepareStatement("INSERT INTO DELIVERY VALUES(?, ?)");
+         pDeliv.clearParameters();
+         pDeliv.setInt(1, currentOrder -1);
+         pDeliv.setInt(2, (o.getCustomer()).getID());
+         int rDeliv = pDeliv.executeUpdate();
        }
 
-       p.setInt(4, orderStatus);
-       int r = p.executeUpdate();
+       // p.setInt(4, orderStatus);
+       // int r = p.executeUpdate();
 
        //need to adjust inventory levels and check for extra topping
 
@@ -151,7 +200,7 @@ public final class DBNinja {
           //used to calcualte the baseId real quick
           int crustBase = 0;
           int sizeBase = 0;
-
+          String sizeForTop = "";
           //calc baseid
           if(pz.getCrust() == crust_thin){
             crustBase = 1;
@@ -166,12 +215,16 @@ public final class DBNinja {
           //calc base id
           if(pz.getSize() == size_s){
             sizeBase = 0;
+            sizeForTop  = "SELECT Small FROM TOPPING WHERE Name = ?";
           } else if(pz.getSize() == size_m){
             sizeBase = 1;
+            sizeForTop  = "SELECT Medium FROM TOPPING WHERE Name = ?";
           } else if(pz.getSize() == size_l){
             sizeBase = 2;
+            sizeForTop  = "SELECT Large FROM TOPPING WHERE Name = ?";
           } else{
             sizeBase = 3;
+            sizeForTop  = "SELECT XLarge FROM TOPPING WHERE Name = ?";
           }
 
           p2.setInt(7, ((sizeBase*4) + crustBase));
@@ -191,9 +244,21 @@ public final class DBNinja {
             int r3 = p3.executeUpdate();
             //update the inventory in TOPPING WHERE Name = t.getName?
 
+            //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top");
+            PreparedStatement pSize = conn.prepareStatement(sizeForTop);
+            pSize.clearParameters();
+          //  pSize.setString(1, sizeForTop);
+            pSize.setString(1, t.getName());
+
+  //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top2");
+            ResultSet pSizeSet = pSize.executeQuery();
+            pSizeSet.next();
+            //  System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top3");
+            double inventChange = pSizeSet.getDouble(1);
+
             PreparedStatement p4 = conn.prepareStatement("UPDATE TOPPING SET Inventory = Inventory - ? WHERE Name = ?");
             p4.clearParameters();
-            p4.setInt(1, 2); //do i need to do a select statement and get the size of it pls no
+            p4.setDouble(1, inventChange); //do i need to do a select statement and get the size of it pls no
             p4.setString(2, t.getName());
             int r4 = p4.executeUpdate();
           }
