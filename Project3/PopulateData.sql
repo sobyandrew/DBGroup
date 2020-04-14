@@ -345,8 +345,8 @@ INSERT INTO ORDER_USE_DISCOUNT(Discount_id, Order_id)
 INSERT INTO ORDER_(Order_id, Total_cost_bus, Total_cost_cust, Dining_status)
   VALUES(6, 7.85, 16.85, 2);
 
-INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
-  VALUES( 2, 'Matt', 'Engers', '8644749953', NULL);
+INSERT INTO CUSTOMER(Customer_id, FullName, Phone_num, Address) /*House_num, Street_name, City, Zipcode, State)*/
+  VALUES( 2, 'Matt Engers', '8644749953', NULL);
 
 INSERT INTO PICKUP(Order_id, Cust_id)
   VALUES(6, 2);
