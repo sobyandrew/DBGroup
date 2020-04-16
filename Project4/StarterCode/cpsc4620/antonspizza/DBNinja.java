@@ -357,7 +357,7 @@ public final class DBNinja {
         // Update the status of every Pizza associated with the order
         ArrayList<Pizza> pizzas = o.getPizzas();
         for(Pizza pz : pizzas){
-           PreparedStatement p = conn.PreparedStatement("UPDATE PIZZA SET Status = ? WHERE Pizza_id = ?");
+            PreparedStatement p = conn.prepareStatement("UPDATE PIZZA SET Status = ? WHERE Pizza_id = ?");
            p.clearParameters();
            p.setInt(1, 1);       // Setting status to 1 to mean that it is completed
            p.setInt(2, pz.getID());
