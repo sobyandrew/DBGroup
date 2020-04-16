@@ -247,10 +247,10 @@ public final class DBNinja {
             //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top");
             PreparedStatement pSize = conn.prepareStatement(sizeForTop);
             pSize.clearParameters();
-          //  pSize.setString(1, sizeForTop);
+            //  pSize.setString(1, sizeForTop);
             pSize.setString(1, t.getName());
 
-  //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top2");
+            //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top2");
             ResultSet pSizeSet = pSize.executeQuery();
             pSizeSet.next();
             //  System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top3");
@@ -304,6 +304,7 @@ public final class DBNinja {
      * @requires c is not null. C's ID is -1 and will need to be assigned
      * @ensures c is given an ID and added to the database
      */
+    // WORKS
     public static void addCustomer(ICustomer c) throws SQLException, IOException
     {
         connect_to_db();
@@ -311,7 +312,6 @@ public final class DBNinja {
 		Note: the ID will be -1 and will need to be replaced to be a fitting primary key
 		Note that the customer is an ICustomer data type, which means c could be a dine in, carryout or delivery customer
         */
-
 
         // Cast the customer and handle as appropriate
         if(c instanceof DeliveryCustomer){
@@ -349,17 +349,20 @@ public final class DBNinja {
      * @requires the order exists in the database
      * @ensures the order will be marked as complete
      */
+    // Needs to be tested
     public static void CompleteOrder(Order o) throws SQLException, IOException
     {
         connect_to_db();
-		/*add code to mark an order as complete in the DB. You may have a boolean field for this, or maybe a completed time timestamp. However you have it, */
-
-        /* TODO
-        //Get current order ID
-        //Search for all pizzas on the order
-        //Update the status of each Pizza
-        */
-
+        
+        // Update the status of every Pizza associated with the order
+        ArrayList<Pizza> pizzas = o.getPizzas();
+        for(Pizza pz : pizzas){
+           PreparedStatement p = conn.PreparedStatement("UPDATE PIZZA SET Status = ? WHERE Pizza_id = ? ;");
+           p.clearParameters();
+           p.setInt(1, 1)       // Setting status to 1 to mean that it is completed
+           p.setInt(2, pz.getID())
+           int r = p.executeUpdate()
+       }
         conn.close();
     }
 
@@ -470,7 +473,7 @@ public final class DBNinja {
         ArrayList<Order> os = new ArrayList<Order>();
         Order addo = new Order(-1, null, "-1");
 		/*add code to get a list of all open orders. Only return Orders that have not been completed. If any pizzas are not completed, then the order is open.*/
-      //select orderID from Pizza Where Status == 0 (not complete)
+        //select orderID from Pizza Where Status == 0 (not complete)
 
         PreparedStatement p = conn.prepareStatement("SELECT PIZZA.Order_id, Dining_status FROM PIZZA JOIN ORDER_ ON PIZZA.Order_id = ORDER_.Order_id WHERE Status = ?"); // might add distinct
         p.clearParameters();
@@ -532,6 +535,7 @@ public final class DBNinja {
      * @requires size = size_s || size_m || size_l || size_xl AND crust = crust_thin || crust_orig || crust_pan || crust_gf
      * @ensures the base price for a pizza with that size and crust is returned
      */
+    // Needs to be tested
     public static double getBasePrice(String size, String crust) throws SQLException, IOException
     {
         connect_to_db();
@@ -548,9 +552,6 @@ public final class DBNinja {
           bp = rset.getDouble(1);
           System.out.println(bp);
         }
-
-        //add code to get the base price for that size and crust pizza Depending on how you store size and crust in your database, you may have to do a conversion
-
         conn.close();
         return bp;
     }
@@ -613,7 +614,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures the list contains all carryout and delivery customers in the database
      */
-     //done this function
+     // WORKS
     public static ArrayList<ICustomer> getCustomerList() throws SQLException, IOException
     {
         ArrayList<ICustomer> custs = new ArrayList<ICustomer>();
@@ -626,18 +627,11 @@ public final class DBNinja {
             //even if you only have one result, you still need to call ResultSet.next() to load the first tuple
             while(rset.next())
             {
-                // TODO: need to update the  naming convention for first name and last name in project 3 database and here in names. 
                 int custID = rset.getInt(1);
-                String fName = rset.getString(2);
-                String lName = rset.getString(3);
-                String phoneNum = rset.getString(4);
-                String address = rset.getString(5);
-                DeliveryCustomer cust = new DeliveryCustomer(custID, (fName + " " + lName), phoneNum, address);
-                // int houseNum = rset.getInt(5);
-                // String streetName = rset.getString(6);
-                // String city = rset.getString(7);
-                // String zip = rset.getString(8);             // Should this be an int?
-                // String state = rset.getString(9);
+                String name = rset.getString(2);
+                String phoneNum = rset.getString(3);
+                String address = rset.getString(4);
+                DeliveryCustomer cust = new DeliveryCustomer(custID, name, phoneNum, address);
 
                 custs.add(cust);
             }
@@ -713,18 +707,19 @@ public final class DBNinja {
         // Create temporary fake discount
         connect_to_db();
         Discount D = new Discount("fake", 0.0, 0.0, 0);
-        String query = "SELECT Discount_id, Name FROM DISCOUNT WHERE Discount_id = " + ID + ";";
-        /* ^ Do we still need to select the discount_id in this statement? Also, how do we get information from its subclasses (percent_off and dollar amount off), should we do a cast kind of thing as in addCustomer? */
+        int discountID = 0;
+        String discountName = "";
+        double percent_off = 0;
+        double cash_off = 0;
 
+        // Get ID and name of discount from Discount Table
+        String query = "SELECT * FROM DISCOUNT WHERE Discount_id = " + ID + ";";
         Statement stmt = conn.createStatement();
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
                 int discountID = rset.getInt(1);
-                String name = rset.getString(2);
-
-              //  D = new Discount(discountID, name);
-               D = new Discount(name, 1.0, 1.0, discountID);
+                String discountName = rset.getString(2);
             }
         }
         catch (SQLException e) {
@@ -736,6 +731,12 @@ public final class DBNinja {
             conn.close();
             return D;
         }
+
+        //QUESTION: If I query the PERCENT_DISCOUNT Table with a Discount ID that is not in the table, what do I get? Discounts are only in one table and I dont know which until i query one
+        //TODO: Get Discount percent-off from PERCENT_DISCOUNT Table and set equal to percent_off
+        //TODO: Get Discount cash_off from DOLLAR_DISCOUNT Table and set equal to cash_off
+
+        D = new Discount(discountName, percent_off, cash_off, discountID);
         conn.close();
         return D;
     }
@@ -743,31 +744,111 @@ public final class DBNinja {
 
     private static Pizza getPizza(int ID)  throws SQLException, IOException
     {
-        //add code to get Pizza Remember, a Pizza has toppings and discounts on it
         connect_to_db();
-        /* The nulls below are in place of ArrayLists, so they might cause errors */
-        //Pizza P = new Pizza(1, "fake", "fake", null, null, 0.0);
-        Pizza P = new Pizza(1, "fake", "fake", 0.0);
-        String query = "SELECT * FROM PIZZA WHERE Pizza_id = " + ID + ";";
-
         Statement stmt = conn.createStatement();
+        Pizza P = new Pizza(1, "fake", "fake", 0.0);
+        int pizzaID = 0;
+        String pizzaSize = "";
+        String pizzaCrust = "";
+        double pizzaBasePrice = 0.0;
+        int pizzaBasePriceID = 0;
+        String toppingName = "";
+        boolean extraTopping = false;
+        double toppingPrice = 0.0;
+        double toppingInventoryLevel = 0.0;
+        int toppingID = 0;
+        int pizzaDiscountID = 0;
+
+        // Get ID and BasePrice from PIZZA Table in database
+        String query = "SELECT Pizza_id, Base_price_id FROM PIZZA WHERE Pizza_id = " + ID + ";";
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
-                int pizzaID = rset.getInt(1);
-                String timestamp = rset.getString(2);       // What kind of object do we want to store a timestamp in? Or do we even need to?
-                double price = rset.getDouble(3);
-                double busCost = rset.getDouble(4);
-                int status = rset.getInt(5);
-                int orderID = rset.getInt(6);
-                int basePriceID = rset.getInt(7);
+                pizzaID = rset.getInt(1);
+                pizzaBasePriceID = rset.getInt(2);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Pizza");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return P;
+        }
 
-                /* The database we have is different from what he has in Pizza.java, So i just included the attributes that are in Pizza.java */
-                /* We need to get the crust and size of the pizza somehow, because its not in our database from Pizza */
-                /* I think we also have to get the topping list and the discount list from the database somehow */
+        // Get size, crust, and baseCost from BASE_PRICE table
+        //QUESTION: What is the difference between base_cost and price in the BASE_PRICE table? which should we put for pizzaBasePrice? 
+        query = "SELECT Size, Crust_type, Price FROM BASE_PRICE WHERE Base_price_id = " + pizzaBasePriceID + ";";
+        try {
+            ResultSet rset = stmt.executeQuery(query);
+            while(rset.next()) {
+                pizzaSize = rset.getString(1);
+                pizzaCrust = rset.getString(2);
+                pizzaBasePrice = rset.getDouble(3)
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Pizza");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return P;
+        }
 
-                //crust and size can be obtained from basePrice ID
-                //P = new Pizza(pizzaID, "crust", "size", basePriceID);
+        P  = new Pizza(pizzaID, pizzaSize, pizzaCrust, pizzaBasePrice);
+
+        //Get list of the names of each topping on the pizza
+        query = "SELECT Topping_name, Extra_topping FROM PIZZA_CONTAINS_TOPPING WHERE Pizza_id = " + pizzaID + ";";
+        try{
+            ResultSet rset = stmt.executeQuery(query);
+            while(rset.next()){
+                toppingName = rset.getString(1);
+                extraTopping = rset.getBoolean(2);      //QUESTION: is getBoolean a valid function call?
+
+                // Get further details about each topping that is on the pizza
+                query = "SELECT ID, Price, Inventory FROM TOPPING WHERE Name = " + toppingName + ";";
+                try{
+                    ResultSet result = stmt.executeQuery(query);
+                    while(result.next()){
+                        toppingID = result.getInt(1);
+                        toppingPrice = result.getDouble(2);
+                        toppingInventoryLevel = result.getDouble(3);
+                    }
+                    // Add topping to list of toppings on Pizza
+                    P.addTopping(new Topping(toppingName, toppingPrice, toppingInventoryLevel, toppingID))
+                }
+                catch (SQLException e) {
+                    System.out.println("Error loading Pizza");
+                    while (e != null) {
+                        System.out.println("Message     : " + e.getMessage());
+                        e = e.getNextException();
+                    }
+                    conn.close();
+                    return P;
+                }
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("Error loading Pizza");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return P;
+        }
+        
+        //Get list of discounts applied to the pizza
+        query = "SELECT Discount_id FROM PIZZA_USE_DISCOUNT WHERE Pizza_id = " + pizzaID + ";";
+        try{
+            ResultSet rset = stmt.executeQuery(query);
+            while(rset.next()){
+                pizzaDiscountID = rset.getInt(1);
+                P.addDiscount(pizzaDiscountID);
             }
         }
         catch (SQLException e) {
@@ -787,17 +868,15 @@ public final class DBNinja {
     private static ICustomer getCustomer(int ID)  throws SQLException, IOException
     {
         connect_to_db();
-        //add code to get customer
+        Statement stmt = conn.createStatement();
 
-        /* QUESTION: How do we know what type of customer we are going to get for casting before we do a search? I dont know what to set iCustomer = to before we run the query*/
+        
         ICustomer C = new DeliveryCustomer(-1, "test","test", "test");
         String query = "SELECT * FROM CUSTOMER WHERE Customer_id = " + ID + ";";
-
-        Statement stmt = conn.createStatement();
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
-                /* I dont really know what to put here */
+                
                 break;
                 // C = ?
             }
@@ -818,9 +897,7 @@ public final class DBNinja {
     private static Order getOrder(int ID)  throws SQLException, IOException
     {
         connect_to_db();
-        //add code to get an order. Remember, an order has pizzas, a customer, and discounts on it
-        /* Below there are nulls for customer and Arraylists, so that might throw an error */
-        //Order O = new Order(0, null, "fake", null, null);
+        // Search for the specific order that corresponds to the ID passed in
         Order O = new Order(0, null, "fake");
         String query = "SELECT * FROM ORDER WHERE Order_id = " + ID + ";";
 
@@ -833,7 +910,6 @@ public final class DBNinja {
                 double custCost = rset.getDouble(3);
                 int diningStatus = rset.getInt(4);
               }
-                // O = new Order(...);      We need to get the ArrayLists and customer here before we can set O to a new order
         }
         catch (SQLException e) {
             System.out.println("Error running getCustomer");
@@ -844,6 +920,27 @@ public final class DBNinja {
             conn.close();
             return O;
         }
+
+        // TODO: Get the customer that is associated with the order
+        query = "SELECT * FROM PIZZA WHERE Order_id = " + orderID + ";"
+        try {
+            ResultSet rset = stmt.executeQuery(query);
+            while(rset.next()) {
+                // add pizza to list
+              }
+        }
+        catch (SQLException e) {
+            System.out.println("Error running getCustomer");
+            while (e != null) {
+                System.out.println("Message     : " + e.getMessage());
+                e = e.getNextException();
+            }
+            conn.close();
+            return O;
+        }
+
+        // TODO: Get the list of pizzas on the order
+        // TODO: Get the list of discounts applied to the order
         conn.close();
         return O;
     }
