@@ -472,54 +472,111 @@ public final class DBNinja {
 
         ArrayList<Order> os = new ArrayList<Order>();
         Order addo = new Order(-1, null, "-1");
-		/*add code to get a list of all open orders. Only return Orders that have not been completed. If any pizzas are not completed, then the order is open.*/
-        //select orderID from Pizza Where Status == 0 (not complete)
 
-        PreparedStatement p = conn.prepareStatement("SELECT PIZZA.Order_id, Dining_status FROM PIZZA JOIN ORDER_ ON PIZZA.Order_id = ORDER_.Order_id WHERE Status = ?"); // might add distinct
-        p.clearParameters();
-        p.setInt(1, 0); // setting status to 0 its not completed yet where 1 is completed
+        //need to remove ‘test’ in add customer
+        //and when updating inventory need to check if extra topping was used subtract 2x if it was;
+        PreparedStatement p1 = conn.prepareStatement("SELECT DISTINCT ORDER_.Order_id, Dining_status FROM PIZZA NATURAL JOIN ORDER_ WHERE Status = ?");
+        p1.clearParameters();
+        p1.setInt(1,0);
 
-        ResultSet rset = p.executeQuery();
+        ResultSet rset1 = p1.executeQuery();
+        while(rset1.next()){
+            int orderNum = rset1.getInt(1);
+            int diningStat =rset1.getInt(2);
 
-        // public Order(int i, ICustomer c, String type)
-        // {
-        //     ID = i;
-        //     cust = c;
-        //     order_type = type;
-        //     pizzas = new ArrayList<Pizza>();
-        //     discounts = new ArrayList<Discount>();
-        // }
-        while(rset.next())
-        {
-          //ICustomer cust;
-          int order = rset.getInt(1);
-          int dining = rset.getInt(2);
-          String status ="";
-          //this is needed to get the customer data
-          if(dining == 1)
-          {
-            DineInCustomer cust = new DineInCustomer(1, null, 1);
-            status = dine_in;
-            //prepared statement for dine in cust
-            addo = new Order(order, cust, status);
-          }
-          else if(dining == 2){
+            if(diningStat == 1){
+                //get dine in customer info tables / seats
+                PreparedStatement p2 = conn.prepareStatement("SELECT Table_num FROM DINE_IN WHERE Order_id = ?");
+                p2.clearParameters();
+                p2.setInt(1, orderNum);
+                ResultSet rset2 = p2.executeQuery();
 
-            DineOutCustomer cust = new DineOutCustomer(1, "test", "testphone");
-            status = pickup;
-            //prepared statement for pickupcus
-            addo = new Order(order, cust, status);
-          }
-          else{
-            DeliveryCustomer cust = new DeliveryCustomer(-1, "fname", "lname", "address");
-            status = delivery;
-            //prepared statement for deliverycust
-            addo = new Order(order, cust, status);
-          }
-          // PreparedStatement p2 = conn.prepareStatement("SELECT * FROM ORDER WHERE Status = ?"); // might add distinct
-          // p.clearParameters();
-        //  add = new Order(order, cust, status);
-          os.add(addo);
+                rset2.next(); // maybe can do while loop
+                int tNum = rset2.getInt(1);
+
+                //get seats
+                List<Integer> s;
+                PreparedStatement p3 = conn.prepareStatement("SELECT Seat_nums FROM SEATS WHERE Order_id = ?");
+                p3.clearParameters();
+                p3.setInt(1, orderNum);
+                ResultSet rset3 = p3.executeQuery();
+                while(rset3.next()){
+                    int seatFromOrder = rset3.getInt(1);
+                    s.add(seatFromOrder);
+                }
+
+                DineInCustomer cust = new DineInCustomer(tNum, s, -1); // -1 because these dont have ids in our db
+                addo = new Order(orderNum,  cust, dine_in);            
+            } else if(diningStat == 2){
+                //pickup status
+                PreparedStatement p4 = conn.prepareStatement("SELECT Cust_id FROM PICKUP WHERE Order_id = ?");
+                p4.clearParameters();
+                p4.setInt(1, orderNum);
+                ResultSet rset4 = p4.executeQuery();
+                rset4().next();
+                int custNum = rset4.getInt(1);
+
+                PreparedStatement p5 = conn.prepareStatement("SELECT FullName, Phone_num FROM CUSTOMER WHERE Customer_id = ?");
+                p5.clearParameters();
+                p5.setInt(1, custNum);
+
+                ResultSet rset5 = p5.executeQuery();
+
+                String custName = rset5.getString(1);
+                String phoneNum = rset5.getString(2);
+
+                DineOutCustomer cust = new DineOutCustomer(custNum, custName, phoneNum);
+                addo = new Order(orderNum, cust, pickup); 
+            } else{
+                //delivery status
+                PreparedStatement p6 = conn.prepareStatement("SELECT Cust_id FROM DELIVERY WHERE Order_id = ?");
+                p6.clearParameters();
+                p6.setInt(1, orderNum);
+
+                ResultSet rset6 = p6.executeQuery();
+                rset6().next();
+                int custNum = rset6.getInt(1);
+
+                PreparedStatement p7 = conn.prepareStatement("SELECT FullName, Phone_num, Address FROM CUSTOMER WHERE Customer_id = ?");
+                p7.clearParameters();
+                p7.setInt(1, custNum);
+
+                ResultSet rset7 = p7.executeQuery();
+                String custName = rset7.getString(1);
+                String phoneNum = rset7.getString(2);
+                String custAddress = rset7.getString(3);
+
+                DeliveryCustomer cust = new DeliveryCustomer(custNum, custName, phoneNum, custAddress);
+                addo = new Order(orderNum, cust, delivery); 
+            }
+
+            // add all the pizzas
+            PreparedStatement p8 = conn.prepareStatement("SELECT Pizza_id, Base_price_id FROM PIZZA WHERE Order_id = ?");
+            p8.clearParameters();
+            p8.setInt(1, orderNum);
+
+            ResultSet rset8 = p8.executeQuery();
+            while(rset8.next()){
+
+                int pizzaID = rset8.getInt(1);
+                int baseID = rset8.getInt(2);
+
+                PreparedStatement p9 = conn.prepareStatement("SELECT Size, Crust_type, Price FROM BASE_PRICE WHERE Base_price_id = ?");
+                p9.clearParameters();
+                p9.setInt(1, baseID);
+
+                ResultSet rset9 = p9.executeQuery();
+                rset9.next();
+                String pSize = rset9.getString(1);
+                String pCrust = rset9.getString(2);
+                double basePriceNum = rset9.getDouble(3);
+
+                Pizza pizzaAddOnOrder = new Pizza(pizzaID, pSize, pCrust, basePriceNum);
+                addo.addPizza(pizzaAddOnOrder);
+            }
+
+            //now we have successfully created addo and we need to add it onto the order list we are returning
+            os.add(addo);
         }
         conn.close();
         return os;
