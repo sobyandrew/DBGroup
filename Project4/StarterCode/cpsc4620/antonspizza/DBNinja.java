@@ -359,9 +359,9 @@ public final class DBNinja {
         for(Pizza pz : pizzas){
            PreparedStatement p = conn.PreparedStatement("UPDATE PIZZA SET Status = ? WHERE Pizza_id = ? ;");
            p.clearParameters();
-           p.setInt(1, 1)       // Setting status to 1 to mean that it is completed
-           p.setInt(2, pz.getID())
-           int r = p.executeUpdate()
+           p.setInt(1, 1);       // Setting status to 1 to mean that it is completed
+           p.setInt(2, pz.getID());
+           int r = p.executeUpdate();
        }
         conn.close();
     }
@@ -786,7 +786,7 @@ public final class DBNinja {
             while(rset.next()) {
                 pizzaSize = rset.getString(1);
                 pizzaCrust = rset.getString(2);
-                pizzaBasePrice = rset.getDouble(3)
+                pizzaBasePrice = rset.getDouble(3);
             }
         }
         catch (SQLException e) {
@@ -819,7 +819,7 @@ public final class DBNinja {
                         toppingInventoryLevel = result.getDouble(3);
                     }
                     // Add topping to list of toppings on Pizza
-                    P.addTopping(new Topping(toppingName, toppingPrice, toppingInventoryLevel, toppingID))
+                    P.addTopping(new Topping(toppingName, toppingPrice, toppingInventoryLevel, toppingID));
                 }
                 catch (SQLException e) {
                     System.out.println("Error loading Pizza");
