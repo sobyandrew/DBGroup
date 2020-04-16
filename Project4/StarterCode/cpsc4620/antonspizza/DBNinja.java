@@ -718,8 +718,8 @@ public final class DBNinja {
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
-                int discountID = rset.getInt(1);
-                String discountName = rset.getString(2);
+                discountID = rset.getInt(1);
+                discountName = rset.getString(2);
             }
         }
         catch (SQLException e) {
@@ -848,7 +848,7 @@ public final class DBNinja {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()){
                 pizzaDiscountID = rset.getInt(1);
-                P.addDiscount(pizzaDiscountID);
+                P.addDiscount(getDiscount(pizzaDiscountID));
             }
         }
         catch (SQLException e) {
@@ -922,7 +922,7 @@ public final class DBNinja {
         }
 
         // TODO: Get the customer that is associated with the order
-        query = "SELECT * FROM PIZZA WHERE Order_id = " + orderID + ";";
+        query = "SELECT * FROM PIZZA WHERE Order_id = " + ID + ";";
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
