@@ -513,7 +513,7 @@ public final class DBNinja {
                 p4.clearParameters();
                 p4.setInt(1, orderNum);
                 ResultSet rset4 = p4.executeQuery();
-                rset4().next();
+                rset4.next();
                 int custNum = rset4.getInt(1);
 
                 PreparedStatement p5 = conn.prepareStatement("SELECT FullName, Phone_num FROM CUSTOMER WHERE Customer_id = ?");
@@ -534,7 +534,7 @@ public final class DBNinja {
                 p6.setInt(1, orderNum);
 
                 ResultSet rset6 = p6.executeQuery();
-                rset6().next();
+                rset6.next();
                 int custNum = rset6.getInt(1);
 
                 PreparedStatement p7 = conn.prepareStatement("SELECT FullName, Phone_num, Address FROM CUSTOMER WHERE Customer_id = ?");
