@@ -304,7 +304,7 @@ public final class DBNinja {
      * @requires c is not null. C's ID is -1 and will need to be assigned
      * @ensures c is given an ID and added to the database
      */
-    // WORKS
+    // DOESNT WORK -> line 328 error
     public static void addCustomer(ICustomer c) throws SQLException, IOException
     {
         connect_to_db();
@@ -466,6 +466,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures all currently open orders will be included in the returned list.
      */
+    // NOT WORKING, error on line 526
     public static ArrayList<Order> getCurrentOrders() throws SQLException, IOException
     {
         connect_to_db();
