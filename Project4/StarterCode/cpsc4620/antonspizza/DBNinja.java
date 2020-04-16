@@ -45,7 +45,7 @@ public final class DBNinja {
     public final static String crust_pan = "Pan";
     public final static String crust_gf = "Gluten-Free";
 
-    private static int currentCustID = 5;
+  //  private static int currentCustID = 5;
     //private static int currentOrder = 9;
     //private static int currentPizza = 17;
 
@@ -111,7 +111,7 @@ public final class DBNinja {
 
       rsetOrder.next();
       int currentOrder = rsetOrder.getInt(1) + 1;
-      System.out.println(currentOrder); // delete this line
+      //System.out.println(currentOrder); // delete this line
 
       PreparedStatement getPizzaNum = conn.prepareStatement("SELECT Pizza_id FROM PIZZA ORDER BY PIZZA_id DESC LIMIT 1");
       getPizzaNum.clearParameters();
@@ -231,7 +231,7 @@ public final class DBNinja {
           int r2 = p2.executeUpdate();
 
           //insert into PIZZA(ID, timestamp, price, cost, status, orderID, basePrice)
-          System.out.println(pz.toString());
+        //  System.out.println(pz.toString()); think this line needs to be out
           ArrayList<Topping> toppings = pz.getToppings();
           for(Topping t : toppings)
           {
@@ -244,17 +244,18 @@ public final class DBNinja {
             int r3 = p3.executeUpdate();
             //update the inventory in TOPPING WHERE Name = t.getName?
 
-            //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top");
             PreparedStatement pSize = conn.prepareStatement(sizeForTop);
             pSize.clearParameters();
             //  pSize.setString(1, sizeForTop);
             pSize.setString(1, t.getName());
 
-            //System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top2");
             ResultSet pSizeSet = pSize.executeQuery();
             pSizeSet.next();
-            //  System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ before size for top3");
+
             double inventChange = pSizeSet.getDouble(1);
+            if(t.getExtra()){
+              inventChange = inventChange * 2;
+            }
 
             PreparedStatement p4 = conn.prepareStatement("UPDATE TOPPING SET Inventory = Inventory - ? WHERE Name = ?");
             p4.clearParameters();
@@ -313,12 +314,18 @@ public final class DBNinja {
 		Note that the customer is an ICustomer data type, which means c could be a dine in, carryout or delivery customer
         */
 
+        PreparedStatement getCustNum = conn.prepareStatement("SELECT Customer_id FROM CUSTOMER ORDER BY Customer_id DESC LIMIT 1");
+        getCustNum.clearParameters();
+
+        ResultSet custrSet = getCustNum.executeQuery();
+        custrSet.next();
+        int currentCustID = custrSet.getInt(1) + 1;
         // Cast the customer and handle as appropriate
         if(c instanceof DeliveryCustomer){
           //INSERT INTO CUSTOMER(Customer_id, Fname, Lname, Phone_num, House_num, Street_name, City, Zipcode, State)
             //VALUES( 1, 'Andrew', 'Wilkes-Krier', '8642545861', 115, 'Party Blvd', 'Anderson', '29621', 'SC');
             DeliveryCustomer cust = (DeliveryCustomer) c;
-            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, 'test', ?,?)");
+            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, ?,?)");
             p.clearParameters();
             p.setInt(1, currentCustID); //FIXME: just did a private global var bad practice change?
             currentCustID++;
@@ -329,7 +336,7 @@ public final class DBNinja {
 
         }else if(c instanceof DineOutCustomer){
             DineOutCustomer cust = (DineOutCustomer) c;
-            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, 'test', ?, NULL)");
+            PreparedStatement p = conn.prepareStatement("INSERT INTO CUSTOMER VALUES(?,?, ?, NULL)");
             p.clearParameters();
             p.setInt(1, currentCustID); //FIXME: just did a private global var bad practice change?
             currentCustID++;
@@ -353,7 +360,7 @@ public final class DBNinja {
     public static void CompleteOrder(Order o) throws SQLException, IOException
     {
         connect_to_db();
-        
+
         // Update the status of every Pizza associated with the order
         ArrayList<Pizza> pizzas = o.getPizzas();
         for(Pizza pz : pizzas){
@@ -481,9 +488,11 @@ public final class DBNinja {
         p1.setInt(1,0);
 
         ResultSet rset1 = p1.executeQuery();
+        //System.out.println("after p1\n");
         while(rset1.next()){
             int orderNum = rset1.getInt(1);
             int diningStat =rset1.getInt(2);
+              //System.out.println(diningStat);
 
             if(diningStat == 1){
                 //get dine in customer info tables / seats
@@ -492,6 +501,7 @@ public final class DBNinja {
                 p2.setInt(1, orderNum);
                 ResultSet rset2 = p2.executeQuery();
 
+              //  System.out.println("after p2\n");
                 rset2.next(); // maybe can do while loop
                 int tNum = rset2.getInt(1);
 
@@ -501,33 +511,37 @@ public final class DBNinja {
                 p3.clearParameters();
                 p3.setInt(1, orderNum);
                 ResultSet rset3 = p3.executeQuery();
+                //System.out.println("after p3\n");
                 while(rset3.next()){
                     int seatFromOrder = rset3.getInt(1);
                     s.add(seatFromOrder);
                 }
 
                 DineInCustomer cust = new DineInCustomer(tNum, s, -1); // -1 because these dont have ids in our db
-                addo = new Order(orderNum,  cust, dine_in);            
+                addo = new Order(orderNum,  cust, dine_in);
             } else if(diningStat == 2){
                 //pickup status
                 PreparedStatement p4 = conn.prepareStatement("SELECT Cust_id FROM PICKUP WHERE Order_id = ?");
                 p4.clearParameters();
                 p4.setInt(1, orderNum);
                 ResultSet rset4 = p4.executeQuery();
+                //System.out.println("after p4\n");
                 rset4.next();
                 int custNum = rset4.getInt(1);
-
+                //System.out.println(custNum);
                 PreparedStatement p5 = conn.prepareStatement("SELECT FullName, Phone_num FROM CUSTOMER WHERE Customer_id = ?");
                 p5.clearParameters();
                 p5.setInt(1, custNum);
 
                 ResultSet rset5 = p5.executeQuery();
-
+                //System.out.println("after p5\n");
+                rset5.next();
                 String custName = rset5.getString(1);
                 String phoneNum = rset5.getString(2);
 
                 DineOutCustomer cust = new DineOutCustomer(custNum, custName, phoneNum);
-                addo = new Order(orderNum, cust, pickup); 
+                addo = new Order(orderNum, cust, pickup);
+                //System.out.println("end customer p5\n");
             } else{
                 //delivery status
                 PreparedStatement p6 = conn.prepareStatement("SELECT Cust_id FROM DELIVERY WHERE Order_id = ?");
@@ -535,6 +549,7 @@ public final class DBNinja {
                 p6.setInt(1, orderNum);
 
                 ResultSet rset6 = p6.executeQuery();
+              //  System.out.println("after p6\n");
                 rset6.next();
                 int custNum = rset6.getInt(1);
 
@@ -543,20 +558,23 @@ public final class DBNinja {
                 p7.setInt(1, custNum);
 
                 ResultSet rset7 = p7.executeQuery();
+                rset7.next();
+                //System.out.println("after p7\n");
                 String custName = rset7.getString(1);
                 String phoneNum = rset7.getString(2);
                 String custAddress = rset7.getString(3);
 
                 DeliveryCustomer cust = new DeliveryCustomer(custNum, custName, phoneNum, custAddress);
-                addo = new Order(orderNum, cust, delivery); 
+                addo = new Order(orderNum, cust, delivery);
             }
-
+            //System.out.println("before customer p8\n");
             // add all the pizzas
-            PreparedStatement p8 = conn.prepareStatement("SELECT Pizza_id, Base_price_id FROM PIZZA WHERE Order_id = ?");
+            PreparedStatement p8 = conn.prepareStatement("SELECT Pizza_id, Base_price_id FROM PIZZA WHERE Order_id = ?"); // do we need AND STATUS = 0?
             p8.clearParameters();
             p8.setInt(1, orderNum);
 
             ResultSet rset8 = p8.executeQuery();
+            //System.out.println("after customer p8\n");
             while(rset8.next()){
 
                 int pizzaID = rset8.getInt(1);
@@ -573,10 +591,127 @@ public final class DBNinja {
                 double basePriceNum = rset9.getDouble(3);
 
                 Pizza pizzaAddOnOrder = new Pizza(pizzaID, pSize, pCrust, basePriceNum);
+
+                //SELECT Name, Price, Inventory, ID, Extra_topping FROM (PIZZA NATURAL JOIN PIZZA_CONTAINS_TOPPING) JOIN TOPPING ON Topping_name = Name WHERE Pizza_id = ?
+                PreparedStatement p10 = conn.prepareStatement("SELECT Name, TOPPING.Price, Inventory, ID, Extra_topping FROM (PIZZA NATURAL JOIN PIZZA_CONTAINS_TOPPING) JOIN TOPPING ON Topping_name = Name WHERE Pizza_id = ?");
+                p10.clearParameters();
+                p10.setInt(1, pizzaID);
+
+                ResultSet rset10 = p10.executeQuery();
+
+                while(rset10.next()){
+                  String tName = rset10.getString(1);
+                  double tPrice = rset10.getDouble(2);
+                  double tInvent = rset10.getDouble(3);
+                  int tID = rset10.getInt(4);
+                  boolean tExtra = rset10.getBoolean(5);
+
+                  Topping t = new Topping(tName, tPrice, tInvent, tID);
+
+                  if(tExtra){
+                    t.makeExtra();
+                  }
+                  pizzaAddOnOrder.addTopping(t);
+
+                }
+                //pizza use discount disc id 1 /5 are percent 234 are DOLLAR_DISCOUNT
+                PreparedStatement p11 = conn.prepareStatement("SELECT Discount_id FROM PIZZA_USE_DISCOUNT WHERE Pizza_id = ?");
+                p11.clearParameters();
+
+                p11.setInt(1, pizzaID);
+
+                ResultSet rset11 = p11.executeQuery();
+
+                //public Discount(String n, double p, double c, int i)
+                // {
+                //     name = n;
+                //     percent_off = p;
+                //     cash_off = c;
+                //     ID = i;
+                // }
+                while(rset11.next()){
+                  int discID = rset11.getInt(1);
+
+                  if(discID == 1 || discID == 5){ // this is percent off
+                    //SELECT Percent_off, Name FROM PERCENT_DISCOUNT NATURAL JOIN DISCOUNT WHERE DISCOUNT.Discount_id = ?
+                    PreparedStatement p12 = conn.prepareStatement("SELECT Percent_off, Name FROM PERCENTAGE_DISCOUNT NATURAL JOIN DISCOUNT WHERE DISCOUNT.Discount_id = ?");
+                    p12.clearParameters();
+                    p12.setInt(1, discID);
+
+                    ResultSet rset12 = p12.executeQuery();
+
+                    while(rset12.next()){
+                        double percentOff = rset12.getDouble(1);
+                        String dname = rset12.getString(2);
+                        Discount percentDisc = new Discount(dname, percentOff/100, 0.0, discID);
+                        pizzaAddOnOrder.addDiscount(percentDisc);
+                    }
+                  } else { //this is dollar off
+
+                    PreparedStatement p13 = conn.prepareStatement("SELECT Amount_off, Name FROM DOLLAR_DISCOUNT NATURAL JOIN DISCOUNT WHERE DISCOUNT.Discount_id = ?");
+                    p13.clearParameters();
+                    p13.setInt(1, discID);
+
+                    ResultSet rset13 = p13.executeQuery();
+
+                    while(rset13.next()){
+                      double dollarOff = rset13.getDouble(1);
+                      String dname = rset13.getString(2);
+                      Discount dollarDisc = new Discount(dname, 0.0, dollarOff, discID);
+                      pizzaAddOnOrder.addDiscount(dollarDisc);
+                    }
+
+                  }
+
+                }
+                //for each pizza add toppings and discount
+
                 addo.addPizza(pizzaAddOnOrder);
             }
 
+            //add discounts to order
+
+            PreparedStatement p14 = conn.prepareStatement("SELECT Discount_id FROM ORDER_USE_DISCOUNT WHERE Order_id = ?");
+            p14.clearParameters();
+            p14.setInt(1, orderNum);
+
+            ResultSet rset14 = p14.executeQuery();
+
+            while(rset14.next()){
+              int orderDisc = rset14.getInt(1);
+
+              if(orderDisc == 1 || orderDisc == 5){
+                PreparedStatement p15 = conn.prepareStatement("SELECT Percent_off, Name FROM PERCENTAGE_DISCOUNT NATURAL JOIN DISCOUNT WHERE DISCOUNT.Discount_id = ?");
+                p15.clearParameters();
+                p15.setInt(1, orderDisc);
+
+                ResultSet rset15 = p15.executeQuery();
+
+                while(rset15.next()){
+                    double percentOff = rset15.getDouble(1);
+                    String dname = rset15.getString(2);
+                    Discount percentDisc = new Discount(dname, percentOff/100, 0.0, orderDisc);
+                    addo.addDiscount(percentDisc);
+                }
+              } else {
+
+                PreparedStatement p16 = conn.prepareStatement("SELECT Amount_off, Name FROM DOLLAR_DISCOUNT NATURAL JOIN DISCOUNT WHERE DISCOUNT.Discount_id = ?");
+                p16.clearParameters();
+                p16.setInt(1, orderDisc);
+
+                ResultSet rset16 = p16.executeQuery();
+
+                while(rset16.next()){
+                  double dollarOff = rset16.getDouble(1);
+                  String dname = rset16.getString(2);
+                  Discount dollarDisc = new Discount(dname, 0.0, dollarOff, orderDisc);
+                  addo.addDiscount(dollarDisc);
+                }
+              }
+            }
+
             //now we have successfully created addo and we need to add it onto the order list we are returning
+
             os.add(addo);
         }
         conn.close();
@@ -608,7 +743,7 @@ public final class DBNinja {
         while(rset.next())
         {
           bp = rset.getDouble(1);
-          System.out.println(bp);
+          //System.out.println(bp);
         }
         conn.close();
         return bp;
@@ -837,7 +972,7 @@ public final class DBNinja {
         }
 
         // Get size, crust, and baseCost from BASE_PRICE table
-        //QUESTION: What is the difference between base_cost and price in the BASE_PRICE table? which should we put for pizzaBasePrice? 
+        //QUESTION: What is the difference between base_cost and price in the BASE_PRICE table? which should we put for pizzaBasePrice?
         query = "SELECT Size, Crust_type, Price FROM BASE_PRICE WHERE Base_price_id = " + pizzaBasePriceID + ";";
         try {
             ResultSet rset = stmt.executeQuery(query);
@@ -899,7 +1034,7 @@ public final class DBNinja {
             conn.close();
             return P;
         }
-        
+
         //Get list of discounts applied to the pizza
         query = "SELECT Discount_id FROM PIZZA_USE_DISCOUNT WHERE Pizza_id = " + pizzaID + ";";
         try{
@@ -928,13 +1063,13 @@ public final class DBNinja {
         connect_to_db();
         Statement stmt = conn.createStatement();
 
-        
+
         ICustomer C = new DeliveryCustomer(-1, "test","test", "test");
         String query = "SELECT * FROM CUSTOMER WHERE Customer_id = " + ID + ";";
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
-                
+
                 break;
                 // C = ?
             }

@@ -237,7 +237,7 @@ INSERT INTO PICKUP(Order_id, Cust_id)
   VALUES(4, 1);
 
 INSERT INTO PIZZA
-  VALUES(4, '2020-03-03 21:30:00', 10.75, 3.30, 0, 4, 10); /* change 0 to 1 just testing now*/
+  VALUES(4, '2020-03-03 21:30:00', 10.75, 3.30, 1, 4, 10); /* change 0 to 1 just testing now*/
 
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 4, 'Regular Cheese', FALSE);
@@ -299,7 +299,7 @@ INSERT INTO DELIVERY(Order_id, Cust_id)
   VALUES(5, 1);
 
 INSERT INTO PIZZA
-  VALUES(5, '2020-03-05 19:11:00', 14.50, 5.59, 1, 5, 14);
+  VALUES(5, '2020-03-05 19:11:00', 14.50, 5.59, 0, 5, 14);
 
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 5, 'Pepperoni', FALSE);
@@ -311,7 +311,7 @@ INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 5, 'Four Cheese Blend', FALSE);
 
 INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
-  VALUES(6, '2020-03-05 19:11:00', 17.00, 5.59, 1, 5, 14);
+  VALUES(6, '2020-03-05 19:11:00', 17.00, 5.59, 0, 5, 14);
 
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 6, 'Ham', TRUE);
@@ -323,7 +323,7 @@ INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 6, 'Four Cheese Blend', FALSE);
 
 INSERT INTO PIZZA(Pizza_id, Timestamp_pizza, Price, Cost_to_bus, Status, Order_id, Base_price_id)
-  VALUES(7, '2020-03-05 19:11:00', 14.00, 5.68, 1, 5, 14);
+  VALUES(7, '2020-03-05 19:11:00', 14.00, 5.68, 0, 5, 14);
 
 INSERT INTO PIZZA_CONTAINS_TOPPING(Pizza_id, Topping_name, Extra_topping)
   VALUES( 7, 'Jalapenos', FALSE);
