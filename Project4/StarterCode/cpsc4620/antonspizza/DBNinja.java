@@ -495,7 +495,7 @@ public final class DBNinja {
                 int tNum = rset2.getInt(1);
 
                 //get seats
-                List<Integer> s;
+                List<Integer> s = new ArrayList<Integer>();
                 PreparedStatement p3 = conn.prepareStatement("SELECT Seat_nums FROM SEATS WHERE Order_id = ?");
                 p3.clearParameters();
                 p3.setInt(1, orderNum);
