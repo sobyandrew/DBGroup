@@ -264,29 +264,32 @@ public final class DBNinja {
             int r4 = p4.executeUpdate();
           }
 
+        //  System.out.println("before discount\n");
           //pizza discounts
           ArrayList<Discount> discounts = pz.getDiscounts();
 
           for(Discount d: discounts)
           {
           //insert into PIZZA_USE_DISCOUNT(Discount_id, Pizza_id)
-            PreparedStatement p5 = conn.prepareStatement("INSERT INTO PIZZA_USE_DISCOUNT(?, ?)");
+            PreparedStatement p5 = conn.prepareStatement("INSERT INTO PIZZA_USE_DISCOUNT VALUES(?, ?)");
             p5.clearParameters();
+            //int r5 = p5.executeUpdate();
+
             p5.setInt(1, d.getID());
             p5.setInt(2, currentPizza -1);
             int r5 = p5.executeUpdate();
           }
-
+          //  System.out.println("after discount\n");
        }
 
        ArrayList<Discount> orderDisc = o.getDiscounts();
 
        for(Discount od : orderDisc){
          //insert into ORDER_USE_DISCOUNT(Discount_id, Order_id)
-         PreparedStatement p6 = conn.prepareStatement("INSERT INTO ORDER_USE_DISCOUNT(?, ?)");
+         PreparedStatement p6 = conn.prepareStatement("INSERT INTO ORDER_USE_DISCOUNT VALUES(?, ?)");
          p6.clearParameters();
          p6.setInt(1, od.getID());
-         p6.setInt(2, currentPizza -1);
+         p6.setInt(2, currentOrder -1);
          int r6 = p6.executeUpdate();
 
        }
