@@ -922,7 +922,7 @@ public final class DBNinja {
         }
 
         // TODO: Get the customer that is associated with the order
-        query = "SELECT * FROM PIZZA WHERE Order_id = " + orderID + ";"
+        query = "SELECT * FROM PIZZA WHERE Order_id = " + orderID + ";";
         try {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next()) {
