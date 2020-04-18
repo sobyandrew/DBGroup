@@ -755,11 +755,11 @@ public final class DBNinja {
             ResultSet rset = stmt.executeQuery(query);
             while(rset.next())
             {
-					String tname = rset.getString(1);
-					double price = rset.getDouble(2);
-					double inv = rset.getDouble(3);
+                String tname = rset.getString(1);
+                double price = rset.getDouble(2);
+                double inv = rset.getDouble(3);
 
-					t = new Topping(tname, price, inv, ID);
+                t = new Topping(tname, price, inv, ID);
 			}
 		}
 		catch (SQLException e) {
