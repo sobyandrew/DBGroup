@@ -403,8 +403,8 @@ public final class DBNinja {
      */
     public static ArrayList<Order> getCurrentOrders() throws SQLException, IOException {
         connect_to_db();
+        ArrayList<Order> os = new ArrayList<Order>();
         try{
-            ArrayList<Order> os = new ArrayList<Order>();
             Order addo = new Order(-1, null, "-1");
 
             PreparedStatement p1 = conn.prepareStatement("SELECT DISTINCT ORDER_.Order_id, Dining_status FROM PIZZA NATURAL JOIN ORDER_ WHERE Status = ?");
