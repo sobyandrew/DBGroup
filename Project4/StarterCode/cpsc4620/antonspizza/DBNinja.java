@@ -42,8 +42,7 @@ public final class DBNinja {
      * @throws SQLException
      * @throws IOException
      */
-    private static boolean connect_to_db() throws SQLException, IOException
-    {
+    private static boolean connect_to_db() throws SQLException, IOException {
         try{
             Class.forName("com.mysql.jdbc.Driver");
         }
@@ -255,8 +254,7 @@ public final class DBNinja {
      * @requires c is not null. C's ID is -1 and will need to be assigned
      * @ensures c is given an ID and added to the database
      */
-    public static void addCustomer(ICustomer c) throws SQLException, IOException
-    {
+    public static void addCustomer(ICustomer c) throws SQLException, IOException {
         connect_to_db();
         try{
             PreparedStatement getCustNum = conn.prepareStatement("SELECT Customer_id FROM CUSTOMER ORDER BY Customer_id DESC LIMIT 1");
@@ -308,13 +306,12 @@ public final class DBNinja {
      * @requires the order exists in the database
      * @ensures the order will be marked as complete
      */
-    public static void CompleteOrder(Order o) throws SQLException, IOException
-    {
+    public static void CompleteOrder(Order o) throws SQLException, IOException {
         connect_to_db();
         try{
             // Update the status of every Pizza associated with the order
             ArrayList<Pizza> pizzas = o.getPizzas();
-            for(Pizza pz : pizzas){
+            for(Pizza pz : pizzas) {
                 PreparedStatement p = conn.prepareStatement("UPDATE PIZZA SET Status = ? WHERE Pizza_id = ?");
                 p.clearParameters();
                 p.setInt(1, 1);       // Setting status to 1 to mean that it is completed
@@ -322,6 +319,7 @@ public final class DBNinja {
                 int r = p.executeUpdate();
             }
             conn.close();
+        }
         catch (SQLException e) {
             System.out.println("Error loading inventory");
             while (e != null) {
@@ -341,8 +339,7 @@ public final class DBNinja {
      * @requires t exists in the database and toAdd > 0
      * @ensures t's inventory level is increased by toAdd
      */
-    public static void AddToInventory(Topping t, double toAdd) throws SQLException, IOException
-    {
+    public static void AddToInventory(Topping t, double toAdd) throws SQLException, IOException {
         connect_to_db();
         try{
             PreparedStatement p = conn.prepareStatement("UPDATE TOPPING SET Inventory = Inventory + ? WHERE ID = ?");
@@ -369,8 +366,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures the returned list will include all toppings and accurate inventory levels
      */
-    public static ArrayList<Topping> getInventory() throws SQLException, IOException
-    {
+    public static ArrayList<Topping> getInventory() throws SQLException, IOException {
         connect_to_db();
         ArrayList<Topping> ts = new ArrayList<Topping>();
 
@@ -405,8 +401,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures all currently open orders will be included in the returned list.
      */
-    public static ArrayList<Order> getCurrentOrders() throws SQLException, IOException
-    {
+    public static ArrayList<Order> getCurrentOrders() throws SQLException, IOException {
         connect_to_db();
         try{
             ArrayList<Order> os = new ArrayList<Order>();
@@ -634,8 +629,7 @@ public final class DBNinja {
      * @requires size = size_s || size_m || size_l || size_xl AND crust = crust_thin || crust_orig || crust_pan || crust_gf
      * @ensures the base price for a pizza with that size and crust is returned
      */
-    public static double getBasePrice(String size, String crust) throws SQLException, IOException
-    {
+    public static double getBasePrice(String size, String crust) throws SQLException, IOException {
         connect_to_db();
         double bp = 0.0;
         try{
@@ -649,6 +643,7 @@ public final class DBNinja {
             }
             conn.close();
             return bp;
+        }
         catch (SQLException e) {
             System.out.println("Error loading inventory");
             while (e != null) {
@@ -667,8 +662,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures all discounts are included in the returned list
      */
-    public static ArrayList<Discount> getDiscountList() throws SQLException, IOException
-    {
+    public static ArrayList<Discount> getDiscountList() throws SQLException, IOException {
         ArrayList<Discount> discs = new ArrayList<Discount>();
         connect_to_db();
         try{
@@ -719,8 +713,7 @@ public final class DBNinja {
      * @throws IOException
      * @ensures the list contains all carryout and delivery customers in the database
      */
-    public static ArrayList<ICustomer> getCustomerList() throws SQLException, IOException
-    {
+    public static ArrayList<ICustomer> getCustomerList() throws SQLException, IOException {
         ArrayList<ICustomer> custs = new ArrayList<ICustomer>();
         connect_to_db();
         //add code to get a list of all customers
@@ -752,8 +745,7 @@ public final class DBNinja {
         return custs;
     }
 
-    private static Topping getTopping(int ID) throws SQLException, IOException
-    {
+    private static Topping getTopping(int ID) throws SQLException, IOException {
         connect_to_db();
         Topping t = new Topping("fake", 0.25, 100.0, -1);
         String query = "Select Name, Price, Inventory From TOPPING where ID = " + ID + ";";
@@ -784,8 +776,7 @@ public final class DBNinja {
 
     }
 
-    private static Discount getDiscount(int ID)  throws SQLException, IOException
-    {
+    private static Discount getDiscount(int ID)  throws SQLException, IOException {
         // Create temporary fake discount
         connect_to_db();
         Discount D = new Discount("fake", 0.0, 0.0, 0);
@@ -820,8 +811,7 @@ public final class DBNinja {
     }
 
 
-    private static Pizza getPizza(int ID)  throws SQLException, IOException
-    {
+    private static Pizza getPizza(int ID)  throws SQLException, IOException {
         connect_to_db();
         Statement stmt = conn.createStatement();
         Pizza P = new Pizza(1, "fake", "fake", 0.0);
@@ -942,8 +932,7 @@ public final class DBNinja {
     }
 
 
-    private static ICustomer getCustomer(int ID)  throws SQLException, IOException
-    {
+    private static ICustomer getCustomer(int ID)  throws SQLException, IOException {
         connect_to_db();
         Statement stmt = conn.createStatement();
 
@@ -971,8 +960,7 @@ public final class DBNinja {
         return C;
     }
 
-    private static Order getOrder(int ID)  throws SQLException, IOException
-    {
+    private static Order getOrder(int ID)  throws SQLException, IOException {
         connect_to_db();
         // Search for the specific order that corresponds to the ID passed in
         Order O = new Order(0, null, "fake");
